@@ -15,8 +15,7 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.gabriel_dev_araujo.client"
+      }
     },
     "web": {
       "bundler": "metro",
@@ -37,14 +36,6 @@
     ],
     "experiments": {
       "typedRoutes": true
-    },
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "0865b83f-952e-4397-a359-6288731fc7f0"
-      }
     }
   }
 }
