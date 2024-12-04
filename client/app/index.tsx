@@ -13,10 +13,12 @@ export default function HomeScreen() {
 
       <View className='w-full bg-lp-blue h-2/5 rounded-b-3xl px-5'>
 
-        <View className='flex flex-row justify-between items-center w-full'>
-          <View className='w-40 flex justify-center items-center'>
-            <Logo></Logo> 
+        <View className='flex flex-row justify-between items-center w-full '>
+          <View className='w-40'>
+            <Logo></Logo>
           </View>
+           
+          
           <Text className='font-montserrat text-white'>
             <Link href="/login">Acesse o cofre</Link>
           </Text>
