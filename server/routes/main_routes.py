@@ -7,7 +7,7 @@ main_routes = Blueprint('main_routes', __name__)
 mydb = mysql.connector.connect(
     host='localhost',
     user='root',
-    password='looplock',
+    password='',
     database='db_looplock'
 )
 
@@ -31,11 +31,12 @@ def login():
     username = data.get('username')
     password = data.get('password')
 
-    # Exemplo básico de resposta (substituir por lógica de autenticação)
+    # Lógica básica de autenticação
     if username == "test" and password == "1234":
-        return jsonify(message="Login realizado com sucesso!", username=username), 200
+        return jsonify(message="Login realizado com sucesso!", id=100), 200
     else:
-        return jsonify(error="Credenciais inválidas!"), 401
+        return jsonify(data), 401
+
 
 # Rota para criar credenciais
 @main_routes.route('/create_credential', methods=['POST'])
@@ -54,7 +55,8 @@ def create_credential():
         jsonify(
             message='Credencial cadastrada com sucesso.',
             credential = credential
-        )
+        ),
+        201
     )
 
 # Rota para deletar credenciais
