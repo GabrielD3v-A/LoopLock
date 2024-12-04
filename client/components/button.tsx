@@ -36,6 +36,48 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
             }   
             router.push(params);
         },
+        login: (params) => {
+            if (!params) {
+                console.log('Nenhum parâmetro enviado.');
+                return;
+            }
+            
+            
+            let jsonObject = JSON.parse(params);
+            console.log(jsonObject);
+            
+            
+            fetch('http://192.168.1.3:5000/login', {
+              method: 'POST',
+              body: JSON.stringify({
+                username: jsonObject.username,
+                password: jsonObject.password
+              }),
+              headers: {
+                'Content-Type': 'application/json', // Corrigido aqui
+                'X-Custom-Header': 'value',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'Accept': '*'
+              }           
+            }).then((response) => {
+              console.log('Enviando dados ao backend:', params);
+              return response.json(); // Corrigido aqui
+            })
+            .then((data) => {
+              console.log('Resposta do backend:', data);
+              if(data.id == 100){
+                router.push('/');
+              }else{
+                console.log('Login falhou');
+              }
+            })
+            .catch((error) => {
+              console.log('Erro:', error);
+              console.log('Login falhou');
+            });
+            
+        },
     };
 
     const handlePress = () => {
