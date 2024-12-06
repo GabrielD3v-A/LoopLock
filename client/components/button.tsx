@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
-import React from 'react';
-import { Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 
 interface ButtonComponentProps {
   text: string; // Texto exibido no botão
@@ -9,7 +9,8 @@ interface ButtonComponentProps {
 }
 
 const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, params }) => {
-  
+  const [isLoading, setIsLoading] = useState(false); // Estado de carregamento
+
     const actions: Record<string, (params?: any) => void> = {
         mostrarOutroExemplo: (params) => {
             if(!params){
@@ -36,22 +37,26 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
             }   
             router.push(params);
         },
-        login: (params) => {
-            if (!params) {
-                console.log('Nenhum parâmetro enviado.');
-                return;
-            }
-            
-            
-            let jsonObject = JSON.parse(params);
-            console.log(jsonObject);
-            
-            
-            fetch('http://192.168.1.3:5000/login', {
+        login: async (params) => {
+          if (!params) {
+            Alert.alert('Erro', 'Parâmetros não fornecidos.');
+            return;
+          }
+          const { username, password } = params;
+          if (!username || !password) {
+            Alert.alert('Erro', 'Usuário e senha são obrigatórios.');
+            return;
+          }
+    
+          setIsLoading(true); // Inicia o estado de carregamento
+    
+    
+          try {
+            fetch('http://192.168.149.227:5000/login', {
               method: 'POST',
               body: JSON.stringify({
-                username: jsonObject.username,
-                password: jsonObject.password
+                username: username,
+                password: password
               }),
               headers: {
                 'Content-Type': 'application/json', // Corrigido aqui
@@ -76,7 +81,12 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
               console.log('Erro:', error);
               console.log('Login falhou');
             });
-            
+          } catch (error) {
+            console.error('Erro:', error);
+            Alert.alert('Erro', 'Falha na conexão. Tente novamente.');
+          } finally {
+            setIsLoading(false); // Finaliza o estado de carregamento
+          }
         },
     };
 
@@ -90,8 +100,16 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
     };
 
   return (
-    <TouchableOpacity style={styles.button} onPress={handlePress}>
-      <Text style={styles.text}>{text}</Text>
+    <TouchableOpacity
+      style={[styles.button, isLoading && styles.buttonDisabled]}
+      onPress={handlePress}
+      disabled={isLoading}
+    >
+      {isLoading ? (
+        <ActivityIndicator color="#FFF" />
+      ) : (
+        <Text style={styles.text}>{text}</Text>
+      )}
     </TouchableOpacity>
   );
 };
@@ -105,6 +123,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#00B4D8',
     paddingVertical: 8,
     borderRadius: 50,
+  },
+  buttonDisabled: {
+    backgroundColor: '#CBCCF5',
   },
   text: {
     color: 'white',
