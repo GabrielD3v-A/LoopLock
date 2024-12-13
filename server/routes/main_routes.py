@@ -13,7 +13,7 @@ mydb = mysql.connector.connect(
 )
 
 # Rota para registro de usuários
-@main_routes.route('/register_user', methods=['POST'])
+@main_routes.route('/register', methods=['POST'])
 def register_user():
     data = request.get_json()  # Recebe os dados enviados no corpo da requisição
     username = data.get('username')
