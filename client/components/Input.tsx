@@ -12,6 +12,8 @@ const InputComponent: React.FC<InputComponentProps> = ({ textPlaceholder, icon, 
     const [isPasswordVisible, setPasswordVisible] = useState(password);
 
 
+
+
     const togglePasswordVisibility = () => {
         if(isPasswordVisible){
             setPasswordVisible(false)
@@ -23,8 +25,8 @@ const InputComponent: React.FC<InputComponentProps> = ({ textPlaceholder, icon, 
 
     return (
         <View className='w-full  font-montserrat text-lp-blue text-base border border-lp-blue mb-3 px-2 bg-black flex flex-row items-center'>
-            <TextInput numberOfLines={1} style={styles.CustomStyleInput} placeholder={textPlaceholder} placeholderTextColor="#03045E" keyboardType={'default'}  secureTextEntry={isPasswordVisible}  onChangeText={onChange} />
-            {icon? <TouchableOpacity className='flex justify-center items-center' onPress={togglePasswordVisibility}><Image source={require('../assets/images/eye-icon.png')} resizeMode='contain' style={styles.CustomStyleIcon}  /></TouchableOpacity>: ''}
+            <TextInput numberOfLines={1} style={styles.CustomStyleInput} placeholder={textPlaceholder} placeholderTextColor="#03045E" keyboardType={'default'}  secureTextEntry={isPasswordVisible}  onChangeText={onChange}   autoCapitalize={icon? 'none' : 'words'} />
+            {icon? <TouchableOpacity className='flex justify-center items-center ' onPress={togglePasswordVisibility}><Image source={require('../assets/images/eye-icon.png')} resizeMode='contain' style={styles.CustomStyleIcon}  /></TouchableOpacity>: ''}
         </View>
     );
 };

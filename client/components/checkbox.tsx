@@ -9,14 +9,14 @@ interface CheckboxComponentProps {
 
 const CheckboxComponent: React.FC<CheckboxComponentProps> = ({ checked, onChange }) => {
     return (
-        <View className='flex flex-row items-center  rounded-full'>
-            <Checkbox
-                style={styles.checkbox}
-                value={checked} // Vinculado ao estado do pai
-                onValueChange={onChange} // Propaga mudanças para o pai
-                color={checked ? '#03045E' : undefined}
-            />
-      </View>
+        
+        <Checkbox
+            style={styles.checkbox}
+            value={checked} // Vinculado ao estado do pai
+            onValueChange={onChange} // Propaga mudanças para o pai
+            color={checked ? '#03045E' : undefined}
+        />
+      
     );
 }
 
