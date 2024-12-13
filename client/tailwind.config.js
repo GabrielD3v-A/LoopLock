@@ -11,7 +11,11 @@ module.exports = {
       },
       fontFamily: {
         'montserrat': ['Montserrat', 'sans-serif'],
-        'montserrat-italic': ['Montserrat-Italic', 'sans-serif']
+        'montserrat-italic': ['Montserrat-Italic', 'sans-serif'],
+        'fellix-light': ['Fellix-Light', 'sans-serif'],
+        'fellix-medium': ['Fellix-Medium', 'sans-serif'],
+        'fellix-bold': ['Fellix-Bold', 'sans-serif'],
+        'fellix-regular': ['Fellix-Regular', 'sans-serif'],
       },
     },
   },

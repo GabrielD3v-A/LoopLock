@@ -12,10 +12,39 @@
       src: url('../fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf') format('ttf');
     }
     @font-face {
-        font-family: 'Montserrat';
-        font-style: normal;
-        font-weight: 400;
-        font-display: swap;
-        src: url('../fonts/Montserrat/Montserrat-VariableFont_wght.ttf') format('ttf');
-      }
+      font-family: 'Montserrat';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('../fonts/Montserrat/Montserrat-VariableFont_wght.ttf') format('ttf');
+    }
+
+    @font-face {
+      font-family: 'Fellix-Light';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('../fonts/Fellix/Fellix-Light.ttf') format('ttf');
+    }
+    @font-face {
+      font-family: 'Fellix-Medium';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('../fonts/Fellix/Fellix-Medium.ttf') format('ttf');
+    }
+    @font-face {
+      font-family: 'Fellix-Bold';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('../fonts/Fellix/Fellix-Bold.ttf') format('ttf');
+    }
+    @font-face {
+      font-family: 'Fellix-SemiBold';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('../fonts/Fellix/Fellix-SemiBold.ttf') format('ttf');
+    }
 }
