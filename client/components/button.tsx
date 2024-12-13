@@ -64,7 +64,7 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
     
     
           try {
-            fetch('http://192.168.149.227:5000/login', {
+            fetch('http://192.168.1.19:5000/login', {
               method: 'POST',
               body: JSON.stringify({
                 username: username,
@@ -141,7 +141,7 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
           setIsLoading(true);
 
           try {
-            fetch('http://192.168.149.227:5000/register', {
+            fetch('http://192.168.1.19:5000/register', {
               method: 'POST',
               body: JSON.stringify({
                 username: username,
