@@ -1,16 +1,14 @@
+import Menu from '@/components/menu'
 import { useAuth } from '@clerk/clerk-expo'
 import React from 'react'
 import { View, Text } from 'react-native'
 
 export default function safe() {
-  const { isLoaded, userId, sessionId } = useAuth()
-  
   return (
-    <View>
+    <View className='w-full h-full max-h-fullflex justify-between items-center'>
         <Text>Meu cofre</Text>
-        <Text>
-          Hello, {userId} your current active session is {sessionId}
-        </Text>
+
+        <Menu/>
     </View>
   )
 }
