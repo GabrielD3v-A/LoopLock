@@ -5,6 +5,8 @@ from models.user import User
 from db.db import db
 from datetime import datetime
 
+from flask_sqlalchemy import SQLAlchemy
+
 # Criar um blueprint para agrupar as rotas principais
 main_routes = Blueprint('main_routes', __name__)
 
@@ -53,19 +55,19 @@ def register_user():
 @main_routes.route('/login', methods=['POST'])
 def login():
     data = request.get_json()  # Recebe os dados enviados no corpo da requisição
-    username = data.get('username')
+    email = data.get('email')
     password = data.get('password')
 
 
     try:
         # Verificando se o usuário existe no banco
-        user = User.query.filter_by(user_email=username).first()
+        user = User.query.filter_by(user_email=email).first()
 
         if user:
             stored_password = user.user_master_password  # A senha armazenada na tabela
 
             # Verifica se a senha fornecida corresponde à senha armazenada
-            if stored_password == password:
+            if user.check_password(password):
                 return jsonify(message="Login realizado com sucesso!", data=data), 200
             else:
                 return jsonify(message="Campos de login inválidos!"), 401

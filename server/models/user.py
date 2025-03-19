@@ -1,6 +1,7 @@
 # user.py
 from db.db import db
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash 
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -26,3 +27,9 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.user_username}>'
+    
+    def set_password(self, password):
+        self.user_master_password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.user_master_password, password)
