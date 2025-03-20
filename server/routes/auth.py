@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from models.user import User
+from flask_jwt_extended import create_access_token, create_refresh_token
 from db import db
 
 # Criar um blueprint para agrupar as rotas principais
@@ -48,14 +49,20 @@ def login():
 
     try:
         # Verificando se o usuário existe no banco
-        user = User.query.filter_by(user_email=email).first()
+        user = User.get_user_by_email(email)
 
         if user:
             stored_password = user.user_master_password  # A senha armazenada na tabela
 
             # Verifica se a senha fornecida corresponde à senha armazenada
             if user.check_password(password):
-                return jsonify(message="Login realizado com sucesso!", data=data), 200
+                access_token = create_access_token(identity=user.user_email)
+                refresh_token =  create_refresh_token(identity=user.user_email)
+                return jsonify({
+                    'message': 'Login realizado com sucesso!',
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
+                }), 200
             else:
                 return jsonify(message="Campos de login inválidos!"), 401
         else:
