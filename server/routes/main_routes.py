@@ -5,76 +5,8 @@ from models.user import User
 from db.db import db
 from datetime import datetime
 
-from flask_sqlalchemy import SQLAlchemy
-
 # Criar um blueprint para agrupar as rotas principais
 main_routes = Blueprint('main_routes', __name__)
-
-# mydb = mysql.connector.connect(
-#     host='localhost',
-#     user='root',
-#     password='',
-#     database='db_looplock'
-# )
-
-# Rota para registro de usuários
-@main_routes.route('/register', methods=['POST'])
-def register_user():
-    data = request.get_json()
-    username = data.get('username')
-    email = data.get('email')
-    password = data.get('password')
-   
-    try:
-         # Verificando se todos os campos foram fornecidos
-        if not username or not email or not password:
-            return jsonify({'message': 'Username, email, and password are required'}), 400
-        
-        existing_user = User.query.filter_by(user_email=email).first()
-        if existing_user:
-            return jsonify(message="E-mail já cadastrado."), 400
-
-        # Criando um novo usuário
-        new_user = User(
-            user_username=username,
-            user_email=email,
-            user_master_password=password
-        )
-
-        # Adicionando o novo usuário ao banco de dados
-        db.session.add(new_user)
-        db.session.commit()
-
-        return jsonify({'message': 'Usuário cadastrado com sucesso!'}), 201
-
-    except Exception as e:
-        db.session.rollback()  # Caso ocorra algum erro, fazemos o rollback
-        return jsonify({'message': f'Erro: {str(e)}'}), 500
-
-# Rota para login de usuários
-@main_routes.route('/login', methods=['POST'])
-def login():
-    data = request.get_json()  # Recebe os dados enviados no corpo da requisição
-    email = data.get('email')
-    password = data.get('password')
-
-
-    try:
-        # Verificando se o usuário existe no banco
-        user = User.query.filter_by(user_email=email).first()
-
-        if user:
-            stored_password = user.user_master_password  # A senha armazenada na tabela
-
-            # Verifica se a senha fornecida corresponde à senha armazenada
-            if user.check_password(password):
-                return jsonify(message="Login realizado com sucesso!", data=data), 200
-            else:
-                return jsonify(message="Campos de login inválidos!"), 401
-        else:
-            return jsonify(message="Usuário não encontrado!"), 404
-    except Exception as e:
-        return jsonify(message=f"Erro: {str(e)}"), 500
 
 
 # Rota para criar credenciais

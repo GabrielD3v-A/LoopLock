@@ -33,3 +33,15 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.user_master_password, password)
+    
+    @classmethod
+    def get_user_by_email(self, email):
+        return self.query.filter_by(user_email=email).first()
+    
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
