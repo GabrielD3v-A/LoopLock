@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from models.user import User
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 from db import db
 
 # Criar um blueprint para agrupar as rotas principais
@@ -70,3 +70,10 @@ def login():
     except Exception as e:
         return jsonify(message=f"Erro: {str(e)}"), 500
 
+
+@auth_bp.route('/refresh', methods=['GET'])
+@jwt_required(refresh=True)
+def refresh_access_token():
+    identity = get_jwt_identity()
+    new_access_token = create_access_token(identity=identity)
+    return jsonify(access_token=new_access_token), 200
