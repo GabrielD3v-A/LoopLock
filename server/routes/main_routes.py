@@ -1,13 +1,12 @@
 from configparser import Error
 from flask import Blueprint, request, jsonify, make_response # type: ignore
 from datetime import datetime
+from flask_jwt_extended import jwt_required
 from models.user import User
 from db.db import db
 from datetime import datetime
 
-# Criar um blueprint para agrupar as rotas principais
 main_routes = Blueprint('main_routes', __name__)
-
 
 # Rota para criar credenciais
 @main_routes.route('/create_credential', methods=['POST'])
@@ -32,6 +31,7 @@ def create_credential():
 
 # Rota para deletar credenciais
 @main_routes.route('/select_credential', methods=['GET'])
+@jwt_required()
 def select_credential():
 
     # Select das informações
