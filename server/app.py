@@ -10,18 +10,17 @@ from routes.auth import auth_bp
 from dotenv import load_dotenv
 import os
 
-load_dotenv() 
-
+load_dotenv()
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = os.getenv('JSON_SORT_KEYS')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = os.getenv('JWT_ACCESS_TOKEN_EXPIRES')
-app.config["JWT_REFRESH_TOKEN_EXPIRES"] = os.getenv('JWT_REFRESH_TOKEN_EXPIRES')
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30) 
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 
-CORS(app, origins=["http://192.168.1.4:5000"])
+CORS(app, origins=["http://localhost:5000"])
 cache = Cache(app)
 cache.clear()
 
