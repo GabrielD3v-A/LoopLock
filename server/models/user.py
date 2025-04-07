@@ -10,8 +10,8 @@ class User(db.Model):
     user_username = db.Column(db.String(255), nullable=False)
     user_email = db.Column(db.String(200), nullable=False, unique=True)
     user_master_password = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
     def __init__(self, user_username, user_email, user_master_password):
         """
@@ -37,6 +37,10 @@ class User(db.Model):
     @classmethod
     def get_user_by_email(self, email):
         return self.query.filter_by(user_email=email).first()
+    
+    @classmethod
+    def get_user_id_by_email(self, email):
+        return self.query.with_entities(self.user_id).filter_by(user_email=email).scalar()
     
     def save(self):
         db.session.add(self)

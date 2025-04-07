@@ -1,148 +1,71 @@
 from configparser import Error
 from flask import Blueprint, request, jsonify, make_response # type: ignore
 from datetime import datetime
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.user import User
+from models.credential import Credential
 from db.db import db
-from datetime import datetime
 
 main_routes = Blueprint('main_routes', __name__)
 
 # Rota para criar credenciais
 @main_routes.route('/create_credential', methods=['POST'])
+@jwt_required()
 def create_credential():
 
-    # Select das informações
-    credential = request.json
+    data = request.get_json()
+    name = data.get('name')
+    username = data.get('username')
+    password = data.get('password')
+    domain = data.get('domain')
 
-    # Select das informações
-    my_cursor = mydb.cursor()
-    sql = f"INSERT INTO credentials (name, password) VALUES ('{credential['name']}', '{credential['password']}')"
-    my_cursor.execute(sql)
-    mydb.commit()
+    try:
+         # Verificando se todos os campos foram fornecidos
+        if not name:
+            return jsonify({'message': 'A credencial precisa conter um nome.'}), 400
+        
+        # Recupera a identidade definida no token (email)
+        identity = get_jwt_identity()
 
-    return make_response(
-        jsonify(
-            message='Credencial cadastrada com sucesso.',
-            credential = credential
-        ),
-        201
-    )
+        # Procura o usuário no banco de dados
+        user_id = User.get_user_id_by_email(identity)
+        if not user_id:
+            return jsonify({'message': 'Usuário não encontrado.'}), 404
+        
+        # Criando uma nova credencial
+        new_credential = Credential(
+            credential_name=name,
+            credential_username=username,
+            credential_password=password,
+            credential_domain=domain,
+            user_id=user_id
+        )
+
+        # Criptografando os dados
+        new_credential.hash_password(password)
+
+        # Adicionando o novo usuário ao banco de dados
+        new_credential.save()
+
+        # Mensagem de sucesso
+        return jsonify({'message': 'Credencial cadastrada com sucesso!'}), 201
+
+    # Tratamento de exceções
+    except Exception as e:
+        db.session.rollback()  # Caso ocorra algum erro, fazemos o rollback
+        return jsonify({'message': f'Erro: {str(e)}'}), 500
 
 # Rota para deletar credenciais
 @main_routes.route('/select_credential', methods=['GET'])
 @jwt_required()
 def select_credential():
-
-    # Select das informações
-    my_cursor = mydb.cursor()
-    my_cursor.execute('SELECT * FROM credentials')
-    my_credentials = my_cursor.fetchall()
-
-    # Tratamento dos dados para retorno em JSON
-    credentials = list()
-    for credential in my_credentials:
-        credentials.append(
-            {
-                'id': credential[0],
-                'name': credential[1],
-                'password': credential[2]
-            }
-        )
-
-    # Retorno em JSON
-    return make_response(
-        jsonify(
-            message='Lista de credenciais',
-            dados = credentials  # Recebe os dados enviados no corpo da requisição
-        )
-    )
+    return jsonify({'message': 'Under Development'}), 200
 
 # Rota para atualizar de credenciais
 @main_routes.route('/update_credential/<int:id>', methods=['PUT'])
-def update_credential(id):
-    # Obtém os dados da requisição (do corpo da requisição)
-    data = request.get_json()
-
-    # Verifica se os dados necessários foram passados
-    if not data or 'name' not in data or 'password' not in data:
-        return make_response(
-            jsonify(
-                message='Dados inválidos. É necessário fornecer nome e senha.'
-            ),
-            400
-        )
-
-    name = data['name']
-    password = data['password']
-
-    try:
-        # Conexão com o banco de dados
-        my_cursor = mydb.cursor()
-
-        # Atualização dos dados no banco
-        sql_update_query = """UPDATE credentials SET name = %s, password = %s WHERE id = %s"""
-        values = (name, password, id)
-
-        # Executa o comando SQL
-        my_cursor.execute(sql_update_query, values)
-        mydb.commit()  # Confirma a transação
-
-        # Verifica se a atualização afetou alguma linha
-        if my_cursor.rowcount > 0:
-            return make_response(
-                jsonify(
-                    message=f'Credenciais atualizadas com sucesso para o ID {id}'
-                ),
-                200
-            )
-        else:
-            return make_response(
-                jsonify(
-                    message=f'Nenhuma credencial encontrada para o ID {id}'
-                ),
-                404
-            )
-    except Exception as e:
-        return make_response(
-            jsonify(
-                message=f'Ocorreu um erro ao atualizar a credencial: {str(e)}'
-            ),
-            500
-        )
+def update_credential():
+    return jsonify({'message': 'Under Development'}), 200
 
 @main_routes.route('/delete_credential/<int:id>', methods=['DELETE'])
-def delete_credential(id):
-    try:
-        # Conexão com o banco de dados
-        my_cursor = mydb.cursor()
-
-        # Comando SQL para deletar a credencial com o ID fornecido
-        sql_delete_query = """DELETE FROM credentials WHERE id = %s"""
-        my_cursor.execute(sql_delete_query, (id,))
-
-        # Commit para confirmar a exclusão
-        mydb.commit()
-
-        # Verifica se alguma linha foi afetada (i.e., se a credencial foi encontrada e deletada)
-        if my_cursor.rowcount > 0:
-            return make_response(
-                jsonify(
-                    message=f'Credencial com ID {id} deletada com sucesso.'
-                ),
-                200
-            )
-        else:
-            return make_response(
-                jsonify(
-                    message=f'Nenhuma credencial encontrada com o ID {id}.'
-                ),
-                404
-            )
-    except Exception as e:
-        return make_response(
-            jsonify(
-                message=f'Ocorreu um erro ao deletar a credencial: {str(e)}'
-            ),
-            500
-        )
+def delete_credential():
+    return jsonify({'message': 'Under Development'}), 200

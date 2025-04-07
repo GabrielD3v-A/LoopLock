@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `credential` (
     `credential_id` BIGINT NOT NULL AUTO_INCREMENT,
     `credential_name` VARCHAR(100) NOT NULL,
 	`credential_username` VARCHAR(100) DEFAULT NULL,
-    `credential_password` VARCHAR(128) DEFAULT NULL,
+    `credential_password` VARCHAR(162) DEFAULT NULL,
     `credential_domain` VARCHAR(100) DEFAULT NULL,
 	`created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
