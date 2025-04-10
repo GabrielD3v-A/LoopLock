@@ -56,16 +56,92 @@ def create_credential():
         return jsonify({'message': f'Erro: {str(e)}'}), 500
 
 # Rota para deletar credenciais
-@main_routes.route('/select_credential', methods=['GET'])
+@main_routes.route('/credential/<int:credential_id>', methods=['GET'])
 @jwt_required()
-def select_credential():
-    return jsonify({'message': 'Under Development'}), 200
+def select_credential(credential_id):
+    try:
+        credential = Credential.get_credential_by_id(credential_id)
+        if not credential:
+            return jsonify({'message': 'Credencial não encontrada.'}), 404
+        
+        credential_data = {
+            'id': credential.credential_id,
+            'name': credential.credential_name,
+            'username': credential.credential_username,
+            'domain': credential.credential_domain
+        }
+        return jsonify({'credential': credential_data}), 200
+        #return jsonify({'message': 'Under Development'}), 200
+    except Exception as e:
+        return jsonify({'message': f'Erro: {str(e)}'}), 500
 
 # Rota para atualizar de credenciais
-@main_routes.route('/update_credential/<int:id>', methods=['PUT'])
-def update_credential():
-    return jsonify({'message': 'Under Development'}), 200
+@main_routes.route('/update_credential/<int:credential_id>', methods=['PUT'])
+@jwt_required()
+def update_credential(credential_id):
+    data = request.get_json()
+    name = data.get('name')
+    username = data.get('username')
+    password = data.get('password')
+    domain = data.get('domain')
 
-@main_routes.route('/delete_credential/<int:id>', methods=['DELETE'])
-def delete_credential():
-    return jsonify({'message': 'Under Development'}), 200
+    try:
+        # Recupera a identidade do usuário autenticado
+        identity = get_jwt_identity()
+        user_id = User.get_user_id_by_email(identity)
+        if not user_id:
+            return jsonify({'message': 'Usuário não encontrado'}), 404
+        
+        # Busca a credencial pelo ID
+        credential = Credential.get_credential_by_id(credential_id)
+        if not credential:
+            return jsonify({'message': 'Credencial não encontrada'}), 404
+        
+        # Verificar se a credencial pertence ao usuário autenticado
+        if credential.user_id != user_id:
+            return jsonify({'message': 'Não autorizado'}), 403
+        
+        # Atualiza apenas os campos que foram enviados
+        if name is not None:
+            credential.credential_name = name
+        if username is not None:
+            credential.credential_username = username
+        if password is not None:
+            credential.hash_password(password)
+        if domain is not None:
+            credential.credential_domain = domain
+
+        db.session.commit()
+        return jsonify({'message': 'Credencial atualizada com sucesso!'}), 200
+    
+    except Exception as e:
+        return jsonify({'message': f'Erro: {str(e)}'}), 500
+
+@main_routes.route('/delete_credential/<int:credential_id>', methods=['DELETE'])
+@jwt_required()
+def delete_credential(credential_id):
+
+    # Recupera a identidade do usuário autenticado a partir do token JWT
+    identity = get_jwt_identity()
+    user_id = User.get_user_id_by_email(identity)
+    if not user_id:
+        return jsonify({'message': 'Usuário não encontrado.'}), 404
+    
+    # Busca a credencial pelo ID
+    credential = Credential.get_credential_by_id(credential_id)
+    if not credential:
+        return jsonify({'message': 'Credencial não encontrada.'}), 404
+
+    # Verifica se a credencial pertence ao usuário autenticado
+    if credential.user_id != user_id:
+        return jsonify({'message': 'Não autorizado para deletar esta credencial.'}), 403
+
+    try:
+        # Remove a credencial do banco de dados
+        db.session.delete(credential)
+        db.session.commit()
+        return jsonify({'message': 'Credencial deletada com sucesso!'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Erro ao deletar credencial: {str(e)}'}), 500

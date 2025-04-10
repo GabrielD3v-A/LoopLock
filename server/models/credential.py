@@ -40,7 +40,11 @@ class Credential(db.Model):
     
     @classmethod
     def get_credential_by_name(self, name):
-        return self.query.filter_by(credential_email=name).first()
+        return self.query.filter_by(credential_name=name).first()
+    
+    @classmethod
+    def get_credential_by_id(self, credential_id):
+        return self.query.filter_by(credential_id=credential_id).first()
     
     def save(self):
         db.session.add(self)
