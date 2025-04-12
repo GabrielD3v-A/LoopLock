@@ -1,15 +1,14 @@
-from configparser import Error
-from flask import Blueprint, request, jsonify, make_response # type: ignore
-from datetime import datetime
+from flask import Blueprint, request, jsonify
+import uuid
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.user import User
 from models.credential import Credential
 from db.db import db
 
-main_routes = Blueprint('main_routes', __name__)
+credential = Blueprint('credential', __name__)
 
 # Rota para criar credenciais
-@main_routes.route('/create_credential', methods=['POST'])
+@credential.route('/credential/create', methods=['POST'])
 @jwt_required()
 def create_credential():
 
@@ -20,7 +19,7 @@ def create_credential():
     domain = data.get('domain')
 
     try:
-         # Verificando se todos os campos foram fornecidos
+        # Verificando se todos os campos foram fornecidos
         if not name:
             return jsonify({'message': 'A credencial precisa conter um nome.'}), 400
         
@@ -38,12 +37,19 @@ def create_credential():
             credential_username=username,
             credential_password=password,
             credential_domain=domain,
+            credential_slug=str(uuid.uuid4()),
             user_id=user_id
         )
 
         # Criptografando os dados
         new_credential.hash_password(password)
 
+        # Gera o ID automaticamente sem finalizar a transação
+        new_credential.flush()
+
+        # Gera a slug do objeto com todos os atributos mantendo a unicidade
+        new_credential.generate_slug(new_credential.credential_id, new_credential.credential_name, new_credential.credential_password, new_credential.credential_domain)
+        
         # Adicionando o novo usuário ao banco de dados
         new_credential.save()
 
@@ -55,17 +61,16 @@ def create_credential():
         db.session.rollback()  # Caso ocorra algum erro, fazemos o rollback
         return jsonify({'message': f'Erro: {str(e)}'}), 500
 
-# Rota para deletar credenciais
-@main_routes.route('/credential/<int:credential_id>', methods=['GET'])
+# Rota para visualizar credenciais
+@credential.route('/credential/select/<credential_slug>', methods=['GET'])
 @jwt_required()
-def select_credential(credential_id):
+def select_credential(credential_slug):
     try:
-        credential = Credential.get_credential_by_id(credential_id)
+        credential = Credential.get_credential_by_slug(credential_slug)
         if not credential:
             return jsonify({'message': 'Credencial não encontrada.'}), 404
         
         credential_data = {
-            'id': credential.credential_id,
             'name': credential.credential_name,
             'username': credential.credential_username,
             'domain': credential.credential_domain
@@ -76,7 +81,7 @@ def select_credential(credential_id):
         return jsonify({'message': f'Erro: {str(e)}'}), 500
 
 # Rota para atualizar de credenciais
-@main_routes.route('/update_credential/<int:credential_id>', methods=['PUT'])
+@credential.route('/update_credential/<int:credential_id>', methods=['PUT'])
 @jwt_required()
 def update_credential(credential_id):
     data = request.get_json()
@@ -117,7 +122,7 @@ def update_credential(credential_id):
     except Exception as e:
         return jsonify({'message': f'Erro: {str(e)}'}), 500
 
-@main_routes.route('/delete_credential/<int:credential_id>', methods=['DELETE'])
+@credential.route('/delete_credential/<int:credential_id>', methods=['DELETE'])
 @jwt_required()
 def delete_credential(credential_id):
 

@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS `credential` (
 	`credential_username` VARCHAR(100) DEFAULT NULL,
     `credential_password` VARCHAR(162) DEFAULT NULL,
     `credential_domain` VARCHAR(100) DEFAULT NULL,
+    `credential_slug` VARCHAR(200) NOT NULL,
 	`created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     `user_id` INT NOT NULL,

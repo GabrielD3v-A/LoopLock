@@ -1,6 +1,6 @@
 from datetime import timedelta
 from flask import Flask, jsonify # type: ignore
-from routes.main_routes import main_routes
+from routes.credential import credential
 from flask import render_template
 from flask_cors import CORS
 from flask_caching import Cache
@@ -27,7 +27,7 @@ cache.clear()
 db.init_app(app)
 jwt.init_app(app)
 
-app.register_blueprint(main_routes)
+app.register_blueprint(credential)
 app.register_blueprint(auth_bp, url_prefix='/auth')
 @app.route('/')
 
