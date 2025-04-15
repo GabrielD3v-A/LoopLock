@@ -1,7 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, session, redirect, url_for
 from models.user import User
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
-from db import db
+from db.db import db
+from werkzeug.security import generate_password_hash, check_password_hash
+from services.crypto_manager import CryptoManager
 
 # Criar um blueprint para agrupar as rotas principais
 auth_bp = Blueprint('auth', __name__)
@@ -15,21 +17,27 @@ def register_user():
     password = data.get('password')
    
     try:
-         # Verificando se todos os campos foram fornecidos
+        # Verificando se todos os campos foram fornecidos
         if not username or not email or not password:
             return jsonify({'message': 'Username, email, and password are required'}), 400
         
+        # Verifica duplicidade de usuário no banco
         existing_user = User.get_user_by_email(email)
         if existing_user:
             return jsonify(message="E-mail já cadastrado."), 403
+    
+        crypto_manager = CryptoManager(password)
+        crypto_manager.generate_master_password_hash(crypto_manager.master_key)
+        crypto_manager.generate_symetric_key(crypto_manager.generate_stretched_master_password(crypto_manager.master_key))
 
         # Criando um novo usuário
         new_user = User(
             user_username=username,
             user_email=email,
-            user_master_password=password
+            user_master_password=crypto_manager.master_password_hash,
+            user_symetric_key=crypto_manager.protected_symetric_key.hex()
         )
-        new_user.set_password(password) 
+        # new_user.set_password(password)
         # Adicionando o novo usuário ao banco de dados
         new_user.save()
 
@@ -46,18 +54,18 @@ def login():
     email = data.get('email')
     password = data.get('password')
 
-
     try:
         # Verificando se o usuário existe no banco
         user = User.get_user_by_email(email)
 
         if user:
-            stored_password = user.user_master_password  # A senha armazenada na tabela
+            # stored_password = user.user_master_password  # A senha armazenada na tabela
 
             # Verifica se a senha fornecida corresponde à senha armazenada
             if user.check_password(password):
                 access_token = create_access_token(identity=user.user_email)
                 refresh_token =  create_refresh_token(identity=user.user_email)
+                session['sym_key'] = user.user_symetric_key
                 return jsonify({
                     'message': 'Login realizado com sucesso!',
                     'access_token': access_token,

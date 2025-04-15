@@ -3,7 +3,14 @@ from db.db import db
 from slugify import slugify
 import hashlib
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash 
+from werkzeug.security import generate_password_hash, check_password_hash
+import secrets
+from cryptography.hazmat.primitives.ciphers import (
+    Cipher, algorithms, modes
+)
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from cryptography.hazmat.primitives import hashes, padding
+from cryptography.hazmat.backends import default_backend
 
 class Credential(db.Model):
     __tablename__ = 'credential'
@@ -35,6 +42,23 @@ class Credential(db.Model):
 
     def __repr__(self):
         return f'<Credential {self.credential_name}>'
+    
+    # def encrypt_data(self, password):
+    #     symetric_key = secrets.token_bytes(32)
+
+    #     # Gera um vetor de inicialização para gerar a chave simétrica do usuário
+    #     iv = secrets.token_bytes(16)
+
+    #     # Inicializa a criptografia da chave simétrica
+    #     aes_256_cipher = Cipher(algorithms.AES(password), modes.CBC(iv), backend=default_backend())
+    #     encryptor = aes_256_cipher.encryptor()
+
+    #     # Cria um padder para garantir que o plaintext seja múltiplo de 16 bytes (tamanho do bloco AES)
+    #     padder = padding.PKCS7(128).padder() # 128 = 16 bytes
+    #     padded_plaintext = padder.update(symetric_key) + padder.finalize()
+
+    #     # Executa a criptografia
+    #     protected_symetric_key = encryptor.update(padded_plaintext) + encryptor.finalize()
     
     def hash_password(self, password):
         self.credential_password = generate_password_hash(password)

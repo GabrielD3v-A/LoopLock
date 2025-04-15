@@ -69,7 +69,7 @@ def select_credential(credential_slug):
         credential = Credential.get_credential_by_slug(credential_slug)
         if not credential:
             return jsonify({'message': 'Credencial não encontrada.'}), 404
-        
+
         credential_data = {
             'name': credential.credential_name,
             'username': credential.credential_username,
@@ -81,9 +81,9 @@ def select_credential(credential_slug):
         return jsonify({'message': f'Erro: {str(e)}'}), 500
 
 # Rota para atualizar de credenciais
-@credential.route('/update_credential/<int:credential_id>', methods=['PUT'])
+@credential.route('/update_credential/<credential_slug>', methods=['PUT'])
 @jwt_required()
-def update_credential(credential_id):
+def update_credential(credential_slug):
     data = request.get_json()
     name = data.get('name')
     username = data.get('username')
@@ -98,7 +98,7 @@ def update_credential(credential_id):
             return jsonify({'message': 'Usuário não encontrado'}), 404
         
         # Busca a credencial pelo ID
-        credential = Credential.get_credential_by_id(credential_id)
+        credential = Credential.get_credential_by_slug(credential_slug)
         if not credential:
             return jsonify({'message': 'Credencial não encontrada'}), 404
         
@@ -122,9 +122,9 @@ def update_credential(credential_id):
     except Exception as e:
         return jsonify({'message': f'Erro: {str(e)}'}), 500
 
-@credential.route('/delete_credential/<int:credential_id>', methods=['DELETE'])
+@credential.route('/delete_credential/<credential_slug>', methods=['DELETE'])
 @jwt_required()
-def delete_credential(credential_id):
+def delete_credential(credential_slug):
 
     # Recupera a identidade do usuário autenticado a partir do token JWT
     identity = get_jwt_identity()
@@ -133,7 +133,7 @@ def delete_credential(credential_id):
         return jsonify({'message': 'Usuário não encontrado.'}), 404
     
     # Busca a credencial pelo ID
-    credential = Credential.get_credential_by_id(credential_id)
+    credential = Credential.get_credential_by_slug(credential_slug)
     if not credential:
         return jsonify({'message': 'Credencial não encontrada.'}), 404
 

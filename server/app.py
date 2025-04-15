@@ -19,6 +19,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv('SQLALCHEMY_TRACK_MODIF
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30) 
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
+app.config["SECRET_KEY"] = os.getenv('SECRET_KEY')
 
 CORS(app, origins=["http://localhost:5000"])
 cache = Cache(app)
