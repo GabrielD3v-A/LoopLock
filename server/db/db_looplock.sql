@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `user` (
     `user_username` VARCHAR(255) NOT NULL,
     `user_email` VARCHAR(200) NOT NULL,
     `user_master_password` VARCHAR(255) NOT NULL,
-    `user_symetric_key` VARCHAR(96) NOT NULL,
+    `user_symetric_key` VARCHAR(128) NOT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     CONSTRAINT `user_pk` PRIMARY KEY (`user_id`)

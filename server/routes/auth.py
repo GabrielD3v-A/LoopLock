@@ -1,8 +1,7 @@
-from flask import Blueprint, jsonify, request, session, redirect, url_for
+from flask import Blueprint, jsonify, request
 from models.user import User
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 from db.db import db
-from werkzeug.security import generate_password_hash, check_password_hash
 from services.crypto_manager import CryptoManager
 
 # Criar um blueprint para agrupar as rotas principais
@@ -24,23 +23,29 @@ def register_user():
         # Verifica duplicidade de usuário no banco
         existing_user = User.get_user_by_email(email)
         if existing_user:
-            return jsonify(message="E-mail já cadastrado."), 403
+            return jsonify(message="Dados inválidos."), 403
     
-        crypto_manager = CryptoManager(password)
-        crypto_manager.generate_master_password_hash(crypto_manager.master_key)
-        crypto_manager.generate_symetric_key(crypto_manager.generate_stretched_master_password(crypto_manager.master_key))
+        # Cria o objeto gerenciador da criptografia e derivação de chaves
+        crypto_manager = CryptoManager(password, email)
+
+        # Gera o hash da senha do usuário para validar o login
+        crypto_manager.generate_master_password_hash(crypto_manager.master_key, password)
+        
+        # Gera a chave symétrica protegida e o vetor de inicialização usado na chave simétrica
+        protected_symetric_key, iv = crypto_manager.generate_symetric_key(crypto_manager.generate_stretched_master_password(crypto_manager.master_key))
 
         # Criando um novo usuário
         new_user = User(
             user_username=username,
             user_email=email,
             user_master_password=crypto_manager.master_password_hash,
-            user_symetric_key=crypto_manager.protected_symetric_key.hex()
+            user_symetric_key=protected_symetric_key+iv # Chave protegida concatenada com o vetor de inicialização para decriptar o cofre no login
         )
-        # new_user.set_password(password)
+
         # Adicionando o novo usuário ao banco de dados
         new_user.save()
 
+        # Mensagem para o front end
         return jsonify({'message': 'Usuário cadastrado com sucesso!'}), 201
 
     except Exception as e:
@@ -50,7 +55,9 @@ def register_user():
 # Rota para login de usuários
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()  # Recebe os dados enviados no corpo da requisição
+    
+    # Recebe os dados enviados no corpo da requisição
+    data = request.get_json()
     email = data.get('email')
     password = data.get('password')
 
@@ -59,22 +66,30 @@ def login():
         user = User.get_user_by_email(email)
 
         if user:
-            # stored_password = user.user_master_password  # A senha armazenada na tabela
 
             # Verifica se a senha fornecida corresponde à senha armazenada
-            if user.check_password(password):
+            if user.check_master_password_hash(email, password, user.user_master_password):
                 access_token = create_access_token(identity=user.user_email)
                 refresh_token =  create_refresh_token(identity=user.user_email)
-                session['sym_key'] = user.user_symetric_key
+                
+                # Cria o objeto gerenciador da criptografia e derivação de chaves
+                crypto_manager = CryptoManager(password, email)
+
+                # Decripta a chave simétrica do usuário passando a senha mestra do usuário derivada com HKDF e o vetor de inicialização
+                symetric_key = crypto_manager.decrypt_symetric_key(crypto_manager.generate_stretched_master_password(crypto_manager.master_key), user.user_symetric_key[:96], user.user_symetric_key[96:])
                 return jsonify({
                     'message': 'Login realizado com sucesso!',
                     'access_token': access_token,
-                    'refresh_token': refresh_token
+                    'refresh_token': refresh_token,
+                    'symetric_key': symetric_key # Retorna a chave simétrica para a sessão do usuário para operar no cofre
                 }), 200
             else:
-                return jsonify(message="Campos de login inválidos!"), 401
+                # Mensagem genérica em caso de dados inválidos
+                return jsonify(message="Dados inválidos."), 401
         else:
-            return jsonify(message="Usuário não encontrado!"), 404
+            # Mensagem genérica em caso de dados inválidos
+            return jsonify(message="Dados inválidos."), 404
+        
     except Exception as e:
         return jsonify(message=f"Erro: {str(e)}"), 500
 

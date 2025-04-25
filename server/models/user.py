@@ -1,14 +1,9 @@
 # user.py
 from db.db import db
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
-import secrets
-from cryptography.hazmat.primitives.ciphers import (
-    Cipher, algorithms, modes
-)
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.primitives import hashes, padding
-from cryptography.hazmat.backends import default_backend
+import hashlib
+import binascii
+import hmac
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -37,11 +32,17 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.user_username}>'
 
-    def set_password(self, password):
-        return generate_password_hash(password)
+    # Checa se o input de senha do usuário corresponde ao hash da senha para validar o login
+    def check_master_password_hash(self, email, master_password, user_master_password_hash):
 
-    def check_password(self, password):
-        return check_password_hash(self.user_master_password, password)
+        # Deriva a senha mestra utilizando PBKDF2-SHA256 certificando-se de que a senha e salt são codificados para bytes
+        attempt_master_key = binascii.hexlify(hashlib.pbkdf2_hmac('sha256', master_password.encode('utf-8'), email.encode('utf-8'), 600000, 32)).decode('utf-8')
+
+        # Deriva a senha mestra utilizando PBKDF2-SHA256 certificando-se de que a senha e salt são codificados para bytes
+        attempt_master_password_hash = binascii.hexlify(hashlib.pbkdf2_hmac('sha256', attempt_master_key.encode('utf-8'), master_password.encode('utf-8'), 600000, 32)).decode('utf-8')
+
+        # Retona booleano na comparação dos hashs
+        return hmac.compare_digest(user_master_password_hash, attempt_master_password_hash)
     
     @classmethod
     def get_user_by_email(self, email):
