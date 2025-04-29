@@ -43,14 +43,18 @@ def create_credential():
         )
 
         # Criptografando os dados
-        new_credential.encrypt_data(new_credential.credential_name, symetric_key)
+        new_credential.credential_name = new_credential.encrypt_data(new_credential.credential_name, symetric_key)
+        new_credential.credential_username = new_credential.encrypt_data(new_credential.credential_username, symetric_key)
+        new_credential.credential_password = new_credential.encrypt_data(new_credential.credential_password, symetric_key)
+        new_credential.credential_domain = new_credential.encrypt_data(new_credential.credential_domain, symetric_key)
 
         # Gera o ID automaticamente sem finalizar a transação
         new_credential.flush()
 
         # Gera a slug do objeto com todos os atributos mantendo a unicidade
         new_credential.generate_slug(new_credential.credential_id, new_credential.credential_name, new_credential.credential_password, new_credential.credential_domain)
-        
+        #new_credential.credential_slug = new_credential.encrypt_data(new_credential.credential_slug, symetric_key)
+
         # Adicionando o novo usuário ao banco de dados
         new_credential.save()
 
@@ -62,19 +66,60 @@ def create_credential():
         db.session.rollback()  # Caso ocorra algum erro, fazemos o rollback
         return jsonify({'message': f'Erro: {str(e)}'}), 500
 
+# Rota para visualizar todas as credenciais por nome
+@credential.route('/credential/select_all', methods=['GET'])
+@jwt_required()
+def select_all_credentials():
+
+    data = request.get_json()
+    symetric_key = data.get('symetric_key')
+
+    try:
+        # Recupera a identidade definida no token (email)
+        identity = get_jwt_identity()
+
+        # Procura o usuário no banco de dados
+        user_id = User.get_user_id_by_email(identity)
+        if not user_id:
+            return jsonify({'message': 'Usuário não encontrado.'}), 404
+        
+        credential_list = Credential.get_all_credentials(identity)
+        credential_json_list = []
+        for credential in credential_list:
+
+            credential_inst = Credential.init_select(
+                credential_name=credential[0],
+                credential_slug=credential[1]
+            )
+
+            credential_data = {
+                'credential_name': credential_inst.decrypt_data(credential_inst.credential_name, symetric_key),
+                'credential_slug': credential_inst.credential_slug
+            }
+
+            credential_json_list.append(credential_data)
+
+        return jsonify({'credentials': credential_json_list}), 200
+    except Exception as e:
+        return jsonify({'message': f'Erro: {str(e)}'}), 500
+    
 # Rota para visualizar credenciais
 @credential.route('/credential/select/<credential_slug>', methods=['GET'])
 @jwt_required()
 def select_credential(credential_slug):
+
+    data = request.get_json()
+    symetric_key = data.get('symetric_key')
+
     try:
         credential = Credential.get_credential_by_slug(credential_slug)
         if not credential:
             return jsonify({'message': 'Credencial não encontrada.'}), 404
 
         credential_data = {
-            'name': credential.credential_name,
-            'username': credential.credential_username,
-            'domain': credential.credential_domain
+            'name': credential.decrypt_data(credential.credential_name, symetric_key),
+            'username': credential.decrypt_data(credential.credential_username, symetric_key),
+            'domain': credential.decrypt_data(credential.credential_domain, symetric_key)
         }
         return jsonify({'credential': credential_data}), 200
         #return jsonify({'message': 'Under Development'}), 200
@@ -90,6 +135,7 @@ def update_credential(credential_slug):
     username = data.get('username')
     password = data.get('password')
     domain = data.get('domain')
+    symetric_key = data.get('symetric_key')
 
     try:
         # Recupera a identidade do usuário autenticado
@@ -110,12 +156,16 @@ def update_credential(credential_slug):
         # Atualiza apenas os campos que foram enviados
         if name is not None:
             credential.credential_name = name
+            credential.credential_name = credential.encrypt_data(credential.credential_name, symetric_key)
         if username is not None:
             credential.credential_username = username
+            credential.credential_username = credential.encrypt_data(credential.credential_username, symetric_key)
         if password is not None:
-            credential.hash_password(password)
+            credential.credential_password = password
+            credential.credential_password = credential.encrypt_data(credential.credential_password, symetric_key)
         if domain is not None:
             credential.credential_domain = domain
+            credential.credential_domain = credential.encrypt_data(credential.credential_domain, symetric_key)
 
         db.session.commit()
         return jsonify({'message': 'Credencial atualizada com sucesso!'}), 200

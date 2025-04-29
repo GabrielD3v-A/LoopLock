@@ -84,10 +84,10 @@ def login():
                     'symetric_key': symetric_key # Retorna a chave simétrica para a sessão do usuário para operar no cofre
                 }), 200
             else:
-                # Mensagem genérica em caso de dados inválidos
+                # Mensagem genérica em caso de dados incorretos
                 return jsonify(message="Dados inválidos."), 401
         else:
-            # Mensagem genérica em caso de dados inválidos
+            # Mensagem genérica caso o usuário não exista
             return jsonify(message="Dados inválidos."), 404
         
     except Exception as e:
