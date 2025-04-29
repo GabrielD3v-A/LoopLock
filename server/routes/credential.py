@@ -17,6 +17,7 @@ def create_credential():
     username = data.get('username')
     password = data.get('password')
     domain = data.get('domain')
+    symetric_key = data.get('symetric_key')
 
     try:
         # Verificando se todos os campos foram fornecidos
@@ -42,7 +43,7 @@ def create_credential():
         )
 
         # Criptografando os dados
-        new_credential.hash_password(password)
+        new_credential.encrypt_data(new_credential.credential_name, symetric_key)
 
         # Gera o ID automaticamente sem finalizar a transação
         new_credential.flush()

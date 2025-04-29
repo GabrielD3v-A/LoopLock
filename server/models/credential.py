@@ -2,14 +2,14 @@
 from db.db import db
 from slugify import slugify
 import hashlib
+import binascii
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-import secrets
 from cryptography.hazmat.primitives.ciphers import (
     Cipher, algorithms, modes
 )
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.primitives import hashes, padding
+from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
 
 class Credential(db.Model):
@@ -43,29 +43,39 @@ class Credential(db.Model):
     def __repr__(self):
         return f'<Credential {self.credential_name}>'
     
-    # def encrypt_data(self, password):
-    #     symetric_key = secrets.token_bytes(32)
+    def encrypt_data(self, field, symetric_key):
 
-    #     # Gera um vetor de inicialização para gerar a chave simétrica do usuário
-    #     iv = secrets.token_bytes(16)
+        # Inicializa a criptografia da chave simétrica
+        un_symetric_key = binascii.unhexlify(symetric_key)
+        #aes_256_cipher = Cipher(algorithms.AES(binascii.unhexlify(symetric_key)), modes.ECB, backend=default_backend())
+        aes_256_cipher = Cipher(algorithms.AES(un_symetric_key), modes.ECB, backend=default_backend())
+        encryptor = aes_256_cipher.encryptor()
 
-    #     # Inicializa a criptografia da chave simétrica
-    #     aes_256_cipher = Cipher(algorithms.AES(password), modes.CBC(iv), backend=default_backend())
-    #     encryptor = aes_256_cipher.encryptor()
+        # Cria um padder para garantir que o plaintext seja múltiplo de 16 bytes (tamanho do bloco AES)
+        padder = padding.PKCS7(128).padder() # 128 = 16 bytes
+        padded_field = padder.update(field) + padder.finalize()
 
-    #     # Cria um padder para garantir que o plaintext seja múltiplo de 16 bytes (tamanho do bloco AES)
-    #     padder = padding.PKCS7(128).padder() # 128 = 16 bytes
-    #     padded_plaintext = padder.update(symetric_key) + padder.finalize()
+        # Executa a criptografia
+        protected_field = encryptor.update(padded_field) + encryptor.finalize()
 
-    #     # Executa a criptografia
-    #     protected_symetric_key = encryptor.update(padded_plaintext) + encryptor.finalize()
+        return protected_field
     
-    def hash_password(self, password):
-        self.credential_password = generate_password_hash(password)
+    def decrypt_data(self, field, symetric_key):
 
-    def check_password(self, password):
-        return check_password_hash(self.credential_password, password)
-    
+        # Cria o objetro decriptador com a o segredo imputado pelo usuário e o vetor de inicialiação utilizaods na criação da chave
+        aes_256_cipher = Cipher(algorithms.AES(binascii.unhexlify(symetric_key)), modes.ECB, backend=self.backend)
+        aes_256_decryptor = aes_256_cipher.decryptor()
+
+        # Reverte o padder utilizado na criptografia
+        padded_protected_field = aes_256_decryptor.update(symetric_key) + aes_256_decryptor.finalize()
+        unpadder = padding.PKCS7(128).unpadder()
+
+        # Decripta a chave protegida
+        field = unpadder.update(padded_protected_field) + unpadder.finalize()
+
+        # Retorna a chave symétrica decriptada em formato string hexadecimal
+        return field
+
     # Gera um identificador único do registro com base em todos os campos fornecidos 
     def generate_slug(self, *fields):
 
