@@ -12,6 +12,7 @@ credential = Blueprint('credential', __name__)
 @jwt_required()
 def create_credential():
 
+    # Recupera dados enviados pelo usuário e a chave simétrica
     data = request.get_json()
     name = data.get('name')
     username = data.get('username')
@@ -71,6 +72,7 @@ def create_credential():
 @jwt_required()
 def select_all_credentials():
 
+    # Recupera a chave simétrica
     data = request.get_json()
     symetric_key = data.get('symetric_key')
 
@@ -83,23 +85,30 @@ def select_all_credentials():
         if not user_id:
             return jsonify({'message': 'Usuário não encontrado.'}), 404
         
+        # Busca todas as credenciais do usuário da sessão
         credential_list = Credential.get_all_credentials(identity)
+
+        # Prepara a lista para arranjar todas as credenciais e enviar na resposta
         credential_json_list = []
         for credential in credential_list:
 
-            credential_inst = Credential.init_select(
+            credential_inst = Credential.init_select( # Utiliza um método de classe apenas para obter as informações necessárias para exibição
                 credential_name=credential[0],
                 credential_slug=credential[1]
             )
 
             credential_data = {
-                'credential_name': credential_inst.decrypt_data(credential_inst.credential_name, symetric_key),
+                'credential_name': credential_inst.decrypt_data(credential_inst.credential_name, symetric_key), # Decripta o nome da credencial
                 'credential_slug': credential_inst.credential_slug
             }
 
+            # Adiciona o dado na lista
             credential_json_list.append(credential_data)
-
+        
+        #Devolve todas as credenciais num objeto json com uma lista de cada credencial também em um objeto json
         return jsonify({'credentials': credential_json_list}), 200
+    
+    # Tratamento de exceções
     except Exception as e:
         return jsonify({'message': f'Erro: {str(e)}'}), 500
     
@@ -108,21 +117,26 @@ def select_all_credentials():
 @jwt_required()
 def select_credential(credential_slug):
 
+    # Recupera a chave simétrica
     data = request.get_json()
     symetric_key = data.get('symetric_key')
 
     try:
+
+        # Busca a credencial e verifica a existência da mesma no banco de dados
         credential = Credential.get_credential_by_slug(credential_slug)
         if not credential:
             return jsonify({'message': 'Credencial não encontrada.'}), 404
 
+        # Monta a resposta decriptando as informações do cofre com a chave simétrica
         credential_data = {
             'name': credential.decrypt_data(credential.credential_name, symetric_key),
             'username': credential.decrypt_data(credential.credential_username, symetric_key),
             'domain': credential.decrypt_data(credential.credential_domain, symetric_key)
         }
         return jsonify({'credential': credential_data}), 200
-        #return jsonify({'message': 'Under Development'}), 200
+
+    # Tratamento de exceções
     except Exception as e:
         return jsonify({'message': f'Erro: {str(e)}'}), 500
 
@@ -130,6 +144,8 @@ def select_credential(credential_slug):
 @credential.route('/update_credential/<credential_slug>', methods=['PUT'])
 @jwt_required()
 def update_credential(credential_slug):
+
+    # Recupera dados enviados pelo usuário e a chave simétrica
     data = request.get_json()
     name = data.get('name')
     username = data.get('username')
@@ -138,7 +154,8 @@ def update_credential(credential_slug):
     symetric_key = data.get('symetric_key')
 
     try:
-        # Recupera a identidade do usuário autenticado
+
+        # Recupera a identidade do usuário autenticado e verifica sua existência no banco de dados
         identity = get_jwt_identity()
         user_id = User.get_user_id_by_email(identity)
         if not user_id:
@@ -153,7 +170,7 @@ def update_credential(credential_slug):
         if credential.user_id != user_id:
             return jsonify({'message': 'Não autorizado'}), 403
         
-        # Atualiza apenas os campos que foram enviados
+        # Atualiza apenas os campos que foram enviados com encriptação
         if name is not None:
             credential.credential_name = name
             credential.credential_name = credential.encrypt_data(credential.credential_name, symetric_key)

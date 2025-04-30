@@ -64,7 +64,6 @@ def login():
     try:
         # Verificando se o usuário existe no banco
         user = User.get_user_by_email(email)
-
         if user:
 
             # Verifica se a senha fornecida corresponde à senha armazenada

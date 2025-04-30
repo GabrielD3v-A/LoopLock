@@ -46,6 +46,7 @@ class Credential(db.Model):
     def __repr__(self):
         return f'<Credential {self.credential_name}>'
     
+    # Função responsável por encriptar o campo fornecido que irá ser salvo no banco de dados
     def encrypt_data(self, field, symetric_key):
 
         # Inicializa a criptografia da chave simétrica
