@@ -1,4 +1,4 @@
-import register from '@/app/(screens)/(public)/register';
+import register from '@/app/(screens)/public/register';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
@@ -37,7 +37,7 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
         showMessage: (params) => {
             console.log('Mensagem:', params?.message || 'Nenhuma mensagem passada.');
         },
-        changePage: () =>{
+        changePage: (params) =>{
             if(!params){
                 console.log('Nenhum parâmetro enviado.');
                 return;

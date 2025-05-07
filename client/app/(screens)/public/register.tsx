@@ -90,7 +90,7 @@ export default function register() {
   
           <Text className='font-montserrat text-xs text-lp-blue w-full'>
               Já possui uma conta?  
-              <Link href="/login" className='font-montserrat text-xs text-lp-lightblue'> Faça Login</Link>
+              <Link href="/(screens)/public/login" className='font-montserrat text-xs text-lp-lightblue'> Faça Login</Link>
           </Text>
           
           <View className='w-full fixed bottom-[-3%]  left-0'>

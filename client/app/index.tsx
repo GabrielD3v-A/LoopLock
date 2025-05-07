@@ -20,7 +20,7 @@ export default function HomeScreen() {
            
           
           <Text className='font-montserrat text-white'>
-            <Link href="/login">Acesse o cofre</Link>
+            <Link href="/(screens)/public/login">Acesse o cofre</Link>
           </Text>
         </View>
 
@@ -30,7 +30,7 @@ export default function HomeScreen() {
               <Text className='font-montserrat font-thin text-xs text-white mb-4'>Gerencie sua segurança digital{"\n"}e de seus Familiares</Text>
 
               <View className='w-2/3'>
-                <ButtonComponent text='Saiba mais'  actionKey='changePage' params='/login'></ButtonComponent>
+                <ButtonComponent text='Saiba mais'  actionKey='changePage' params='(screens)/public/login'></ButtonComponent>
               </View>
               
             </View>
@@ -73,7 +73,7 @@ export default function HomeScreen() {
         <View className='w-full flex flex-col items-center '>
           <Text className='font-montserrat font-normal text-sm text-lp-blue mb-1'>Fique mais organizado e seguro</Text>
           <View className='w-full'>
-            <ButtonComponent text='Vamos la!'  actionKey='changePage' params='/login'></ButtonComponent>
+            <ButtonComponent text='Vamos la!'  actionKey='changePage' params='(screens)/public/login'></ButtonComponent>
           </View>
         </View>
       </View>
