@@ -32,14 +32,14 @@ def register_user():
         crypto_manager.generate_master_password_hash(crypto_manager.master_key, password)
         
         # Gera a chave symétrica protegida e o vetor de inicialização usado na chave simétrica
-        protected_symetric_key, iv = crypto_manager.generate_symetric_key(crypto_manager.generate_stretched_master_password(crypto_manager.master_key))
+        protected_symetric_key = crypto_manager.generate_protected_symetric_key(crypto_manager.master_key)
 
         # Criando um novo usuário
         new_user = User(
             user_username=username,
             user_email=email,
             user_master_password=crypto_manager.master_password_hash,
-            user_symetric_key=protected_symetric_key+iv # Chave protegida concatenada com o vetor de inicialização para decriptar o cofre no login
+            user_symetric_key=protected_symetric_key # Chave protegida concatenada com o vetor de inicialização para decriptar o cofre no login
         )
 
         # Adicionando o novo usuário ao banco de dados
@@ -75,7 +75,7 @@ def login():
                 crypto_manager = CryptoManager(password, email)
 
                 # Decripta a chave simétrica do usuário passando a senha mestra do usuário derivada com HKDF e o vetor de inicialização
-                symetric_key = crypto_manager.decrypt_symetric_key(crypto_manager.generate_stretched_master_password(crypto_manager.master_key), user.user_symetric_key[:96], user.user_symetric_key[96:])
+                symetric_key = crypto_manager.decrypt_symetric_key(user.user_symetric_key)
                 return jsonify({
                     'message': 'Login realizado com sucesso!',
                     'access_token': access_token,

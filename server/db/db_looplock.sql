@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS db_looplock;
+
 CREATE DATABASE IF NOT EXISTS db_looplock;
 
 USE db_looplock;
@@ -6,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `user` (
     `user_id` INT NOT NULL AUTO_INCREMENT,
     `user_username` VARCHAR(255) NOT NULL,
     `user_email` VARCHAR(200) NOT NULL,
-    `user_master_password` VARCHAR(255) NOT NULL,
+    `user_master_password` VARCHAR(64) NOT NULL,
     `user_symetric_key` VARCHAR(128) NOT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
@@ -15,11 +17,11 @@ CREATE TABLE IF NOT EXISTS `user` (
 
 CREATE TABLE IF NOT EXISTS `credential` (
     `credential_id` BIGINT NOT NULL AUTO_INCREMENT,
-    `credential_name` VARCHAR(100) NOT NULL,
-	`credential_username` VARCHAR(100) DEFAULT NULL,
-    `credential_password` VARCHAR(162) DEFAULT NULL,
-    `credential_domain` VARCHAR(100) DEFAULT NULL,
-    `credential_slug` VARCHAR(200) NOT NULL,
+    `credential_name` VARCHAR(256) NOT NULL,
+	`credential_username` VARCHAR(256) DEFAULT NULL,
+    `credential_password` VARCHAR(256) DEFAULT NULL,
+    `credential_domain` VARCHAR(256) DEFAULT NULL,
+    `credential_slug` VARCHAR(40) NOT NULL,
 	`created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     `user_id` INT NOT NULL,

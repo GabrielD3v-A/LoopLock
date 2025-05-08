@@ -25,6 +25,10 @@ def create_credential():
         if not name:
             return jsonify({'message': 'A credencial precisa conter um nome.'}), 400
         
+        # Verifica se os campos tem até 128 caracteres
+        if len(name) | len(username) | len(password) | len(domain) > 128:
+            return jsonify({'message': 'O campo não pode exceder 128 caracteres.'}), 400
+
         # Recupera a identidade definida no token (email)
         identity = get_jwt_identity()
 

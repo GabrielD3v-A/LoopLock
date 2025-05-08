@@ -3,13 +3,12 @@ from db.db import db
 from slugify import slugify
 import hashlib
 import binascii
+import secrets
 from datetime import datetime
 from models.user import User
-from werkzeug.security import generate_password_hash, check_password_hash
 from cryptography.hazmat.primitives.ciphers import (
     Cipher, algorithms, modes
 )
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
 
@@ -46,34 +45,71 @@ class Credential(db.Model):
     def __repr__(self):
         return f'<Credential {self.credential_name}>'
     
-    # Função responsável por encriptar o campo fornecido que irá ser salvo no banco de dados
-    def encrypt_data(self, field, symetric_key):
+    @staticmethod
+    def norm_to_128(field: bytes) -> bytes:
+        if len(field) < 112:
+            return field.ljust(112, b'\x00')
+        else:
+            return field[:112]
+        
+    @staticmethod
+    def unorm_from_128(field: bytes) -> bytes:
+        return field.rstrip(b'\x00')
 
-        # Inicializa a criptografia da chave simétrica
-        aes_256_cipher = Cipher(algorithms.AES(binascii.unhexlify(symetric_key)), modes.ECB(), backend=default_backend())
+    # Função responsável por encriptar o campo fornecido que irá ser salvo no banco de dados
+    def encrypt_data(self, field: str, symetric_key: str) -> str:
+
+        # Transforma o valor do campo em seu valor binário para criptografia
+        field = field.encode("utf-8")
+
+        # Converte a chave simétrica em sua forma binária para operar a criptografia
+        symetric_key = binascii.unhexlify(symetric_key)
+
+        # Gera um vetor de inicialização para manter unicidade da criptografia
+        iv = secrets.token_bytes(16)
+
+        # Instancia a criptografia com o vetor de inicialização e a chave simétrica
+        aes_256_cipher = Cipher(algorithms.AES(symetric_key), modes.CBC(iv), backend=default_backend())
         encryptor = aes_256_cipher.encryptor()
 
         # Cria um padder para garantir que o plaintext seja múltiplo de 16 bytes (tamanho do bloco AES)
         padder = padding.PKCS7(128).padder() # 128 = 16 bytes
-        padded_field = padder.update(field.encode("utf-8")) + padder.finalize()
+        padded_field = padder.update(field) + padder.finalize()
+
+        # Normaliza o campo após o padding para garantir que ele tenha um tamanho fixo de 128 bytes
+        norm_field = self.norm_to_128(padded_field)
 
         # Executa a criptografia
-        protected_field = encryptor.update(padded_field) + encryptor.finalize()
+        protected_field = encryptor.update(norm_field) + encryptor.finalize()
 
-        return binascii.hexlify(protected_field).decode('utf-8')
-    
-    def decrypt_data(self, protected_field, symetric_key):
+        #return binascii.hexlify(protected_field).decode('utf-8') # Chave protegida em formato String
+
+
+        return (
+            binascii.hexlify(protected_field).decode('utf-8') + # Chave protegida em formato String
+            binascii.hexlify(iv).decode('utf-8') # Vetor de inicialização em formato String
+        )
+
+    def decrypt_data(self, credencial_field: str, symetric_key: str):
+
+        # Converte a chave protegida, o campo protegido  e o vetor de inicialização em suas formas binárias para operar a criptografia
+        symetric_key = binascii.unhexlify(symetric_key)
+        protected_field = binascii.unhexlify(credencial_field[:224])
+        iv = binascii.unhexlify(credencial_field[224:])
 
         # Cria o objetro decriptador com a o segredo imputado pelo usuário e o vetor de inicialiação utilizaods na criação da chave
-        aes_256_cipher = Cipher(algorithms.AES(binascii.unhexlify(symetric_key)), modes.ECB(), backend=default_backend())
+        aes_256_cipher = Cipher(algorithms.AES(symetric_key), modes.CBC(iv), backend=default_backend())
         aes_256_decryptor = aes_256_cipher.decryptor()
 
-        # Reverte o padder utilizado na criptografia
-        padded_protected_field = aes_256_decryptor.update(binascii.unhexlify(protected_field)) + aes_256_decryptor.finalize()
-        unpadder = padding.PKCS7(128).unpadder()
-
         # Decripta a chave protegida
-        field = unpadder.update(padded_protected_field) + unpadder.finalize()
+        padded_protected_field = aes_256_decryptor.update(protected_field) + aes_256_decryptor.finalize()
+
+        # Desfaz a normalização do campo o campo após o padding para garantir que ele tenha um tamanho fixo de 128 bytes
+        unorm_field = self.unorm_from_128(padded_protected_field)
+
+        # Reverte o padder utilizado na criptografia
+        unpadder = padding.PKCS7(128).unpadder()
+        field = unpadder.update(unorm_field) + unpadder.finalize()
 
         # Retorna a chave symétrica decriptada em formato string hexadecimal
         return field.decode('utf-8')
