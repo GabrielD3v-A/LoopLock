@@ -14,9 +14,54 @@ export default function Generator() {
   const [isLoading, setIsLoading] = useState(false); // Estado de carregamento
   const [passwordgenerate, setPasswordGenerate] = useState('vazia'); // Estado para a senha gerada
 
+  const [sliderValue, setSliderValue] = useState(8); // ou qualquer valor inicial
+
   const handlePress = () => {
-    console.log(`Nenhuma função encontrada para a chave: `);
+    setIsLoading(true);
+  
+    const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
+    const numberChars = '0123456789';
+    const specialChars = '!@#$%^&*()_+[]{}|;:,.<>?';
+    const ambiguousChars = '{}[]()/\\\'"`~,;:.<>';
+    
+    let charset = '';
+  
+    if (checkedUpperrcase) charset += uppercaseChars;
+    if (checkedLowercase) charset += lowercaseChars;
+    if (checkedNumber) charset += numberChars;
+    if (checkedSpecial) charset += specialChars;
+  
+    // Ambíguos SIM
+    if (checkedYesAmbiguous) {
+      charset += ambiguousChars;
+    }
+  
+    // Ambíguos NÃO
+    if (checkedNotAmbiguous) {
+      for (let char of ambiguousChars) {
+        charset = charset.replaceAll(char, '');
+      }
+    }
+  
+    // Validação: se nada for marcado
+    if (charset.length === 0) {
+      alert('Selecione pelo menos um tipo de caractere.');
+      setIsLoading(false);
+      return;
+    }
+  
+    let generatedPassword = '';
+    for (let i = 0; i < sliderValue; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      generatedPassword += charset[randomIndex];
+    }
+  
+    setPasswordGenerate(generatedPassword);
+    setIsLoading(false);
   };
+  
+  
 
 
   return (
@@ -40,7 +85,7 @@ export default function Generator() {
         )}
       </TouchableOpacity>
 
-      <SlidersComponent></SlidersComponent>
+      <SlidersComponent value={sliderValue} onChange={setSliderValue} />
 
       <View className='w-full flex flex-column items-center justify-between my-5'>
         <Text className='text-lg font-bold'>Deseja carecteres ambíguos ?</Text>
@@ -48,8 +93,11 @@ export default function Generator() {
           <View>
             <Checkbox
               style={styles.checkbox}
-              value={checkedYesAmbiguous} // Vinculado ao estado do pai
-              onValueChange={setCheckedYesAmbiguous}
+              value={checkedYesAmbiguous}
+              onValueChange={(newValue) => {
+                setCheckedYesAmbiguous(newValue);
+                if (newValue) setCheckedNotAmbiguous(false);
+              }}
               color={checkedYesAmbiguous ? '#03045E' : undefined}
             />
             <Text>Sim</Text>
@@ -58,8 +106,11 @@ export default function Generator() {
           <View>
             <Checkbox
               style={styles.checkbox}
-              value={checkedNotAmbiguous} // Vinculado ao estado do pai
-              onValueChange={setCheckedNotAmbiguous}
+              value={checkedNotAmbiguous}
+              onValueChange={(newValue) => {
+                setCheckedNotAmbiguous(newValue);
+                if (newValue) setCheckedYesAmbiguous(false);
+              }}
               color={checkedNotAmbiguous ? '#03045E' : undefined}
             />
             <Text>Não</Text>
