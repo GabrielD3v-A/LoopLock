@@ -1,12 +1,18 @@
-import { Link } from 'expo-router';
+import { Link, useFocusEffect, useRouter } from 'expo-router';
 import { View, Text } from 'react-native';
 import LottieView from 'lottie-react-native';
 import '../assets/style/global.css';
 import Logo from '../components/logo';
-import React from 'react';
+import React, { useEffect } from 'react';
 import ButtonComponent from '@/components/button';
 
 export default function HomeScreen() {
+
+  const router = useRouter();
+  
+  useFocusEffect(() => {
+    router.push('/auth/generator');
+  });
   
   return (
     <View className="flex-1  items-center bg-white w-full">
@@ -73,7 +79,7 @@ export default function HomeScreen() {
         <View className='w-full flex flex-col items-center '>
           <Text className='font-montserrat font-normal text-sm text-lp-blue mb-1'>Fique mais organizado e seguro</Text>
           <View className='w-full'>
-            <ButtonComponent text='Vamos la!'  actionKey='changePage' params='(screens)/public/login'></ButtonComponent>
+            <ButtonComponent text='Vamos la!'  actionKey='changePage' params='/public/login'></ButtonComponent>
           </View>
         </View>
       </View>

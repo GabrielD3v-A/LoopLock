@@ -76,7 +76,7 @@ export default function Login() {
           <ButtonComponent text='Confirmar'  actionKey='login' params={{ username, password, rememberMe }}></ButtonComponent>
         </View>
 
-        <Text className='font-montserrat text-xs text-lp-blue w-full'>Ainda não tem uma conta? <Link href="/register" className='font-montserrat text-xs text-lp-lightblue'>Criar Conta</Link></Text>
+        <Text className='font-montserrat text-xs text-lp-blue w-full'>Ainda não tem uma conta? <Link href="/public/register" className='font-montserrat text-xs text-lp-lightblue'>Criar Conta</Link></Text>
         
         <View className='w-full absolute bottom-1  left-10'>
           <Text className='text-center font-montserrat text-xs text-gray-400'>@Copyright 2023</Text> 
