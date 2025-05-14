@@ -1,14 +1,24 @@
+# Módulos Nativos
 from datetime import timedelta
-from flask import Flask, jsonify # type: ignore
-from routes.credential import credential
-from flask import render_template
-from flask_cors import CORS
-from flask_caching import Cache
-from db.db import db
-from extensions.config import jwt
-from routes.auth import auth_bp
-from dotenv import load_dotenv
 import os
+
+# Módulos do projeto
+from extensions.config import jwt
+from db.db import db
+from routes.credential import credential
+from routes.auth import auth_bp
+
+# Flask
+from flask import Flask, jsonify
+
+# Flask-Cors
+from flask_cors import CORS
+
+# Flask-Caching
+from flask_caching import Cache
+
+# dotenv
+from dotenv import load_dotenv
 
 load_dotenv()
 

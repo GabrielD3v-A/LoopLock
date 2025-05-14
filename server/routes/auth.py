@@ -1,8 +1,13 @@
-from flask import Blueprint, jsonify, request
-from models.user import User
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
+# Módulos do projeto
 from db.db import db
 from services.crypto_manager import CryptoManager
+from models.user import User
+
+# Flask
+from flask import Blueprint, jsonify, request
+
+# Flask-JWT-Extended
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 
 # Criar um blueprint para agrupar as rotas principais
 auth_bp = Blueprint('auth', __name__)

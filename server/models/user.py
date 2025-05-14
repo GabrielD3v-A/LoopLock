@@ -1,9 +1,11 @@
-# user.py
-from db.db import db
+# Módulos Nativos
 from datetime import datetime
 import hashlib
 import binascii
 import hmac
+
+# Módulos do projeto
+from db.db import db
 
 class User(db.Model):
     __tablename__ = 'user'

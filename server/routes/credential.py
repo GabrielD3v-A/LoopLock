@@ -1,9 +1,16 @@
-from flask import Blueprint, request, jsonify
+# Módulos Nativos
 import uuid
-from flask_jwt_extended import jwt_required, get_jwt_identity
+
+# Módulos do projeto
 from models.user import User
 from models.credential import Credential
 from db.db import db
+
+# Flask
+from flask import Blueprint, request, jsonify
+
+# Flask-JWT-Extended
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 credential = Blueprint('credential', __name__)
 

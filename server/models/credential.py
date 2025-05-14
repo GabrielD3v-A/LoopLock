@@ -1,14 +1,18 @@
-# user.py
-from db.db import db
-from slugify import slugify
+# Módulos Nativos
+from datetime import datetime
 import hashlib
 import binascii
 import secrets
-from datetime import datetime
+
+# Módulos do projeto
+from db.db import db
 from models.user import User
-from cryptography.hazmat.primitives.ciphers import (
-    Cipher, algorithms, modes
-)
+
+# python-slugify
+from slugify import slugify
+
+# cryptography
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
 
