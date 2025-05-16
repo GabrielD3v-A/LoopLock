@@ -31,7 +31,7 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 app.config["SECRET_KEY"] = os.getenv('SECRET_KEY')
 
-CORS(app, origins=["http://localhost:8080"])
+CORS(app, origins="*")
 cache = Cache(app)
 cache.clear()
 
