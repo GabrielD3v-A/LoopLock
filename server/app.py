@@ -67,6 +67,14 @@ def missing_token_callback(error):
         'error': 'authorization_required'
     }), 401
 
+from sqlalchemy import text
+@app.route("/ping", methods=["GET"])
+def ping():
+    try:
+        db.session.execute(text("SELECT 1"))
+        return {"message": "Conexão com banco bem-sucedida!"}, 200
+    except Exception as e:
+        return {"message": "Erro na conexão", "error": str(e)}, 500
 
 
 if __name__ == '__main__':
