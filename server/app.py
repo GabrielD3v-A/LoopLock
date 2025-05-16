@@ -31,7 +31,7 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 app.config["SECRET_KEY"] = os.getenv('SECRET_KEY')
 
-CORS(app, origins=["http://localhost:5000"])
+CORS(app, origins=["http://localhost:8080"])
 cache = Cache(app)
 cache.clear()
 
@@ -78,4 +78,5 @@ def ping():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    port = int(os.environ.get("PORT", 8080))  # 8080 é fallback
+    app.run(host="0.0.0.0", port=port)
