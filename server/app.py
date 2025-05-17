@@ -7,6 +7,7 @@ from extensions.config import jwt
 from db.db import db
 from routes.credential import credential
 from routes.auth import auth_bp
+from sqlalchemy import text
 
 # Flask
 from flask import Flask, jsonify
@@ -70,7 +71,6 @@ def missing_token_callback(error):
         'error': 'authorization_required'
     }), 401
 
-from sqlalchemy import text
 @app.route("/ping", methods=["GET"])
 def ping():
     try:
