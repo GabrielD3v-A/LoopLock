@@ -19,6 +19,5 @@ export default function RootLayout() {
         <Stack.Screen name="(screens)/auth/profile" />
       </Stack>
     </Template>
-    
   );
 }

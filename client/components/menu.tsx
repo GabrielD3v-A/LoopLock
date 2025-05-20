@@ -3,8 +3,14 @@ import React from 'react'
 
 const Menu = () => {
   return (
-    <View className='w-full h-60 flex justify-center items-center fixed bottom-0 left-0 bg-lp-blue'>
-      <Text>Menu</Text>
+    <View className='w-full h-full flex flex-row justify-center items-center bg-lp-blue p-16'>
+      <Text className='text-white font-montserrat font-bold text-xl'>Menu</Text>
+      <Text className='text-white font-montserrat font-bold text-xl'>Menu</Text>
+
+      <Text className='text-white font-montserrat font-bold text-xl'>Menu</Text>
+
+      <Text className='text-white font-montserrat font-bold text-xl'>Menu</Text>
+      <Text className='text-white font-montserrat font-bold text-xl'>Menu</Text>
     </View>
   )
 }

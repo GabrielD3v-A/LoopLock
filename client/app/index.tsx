@@ -1,12 +1,19 @@
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { View, Text } from 'react-native';
 import LottieView from 'lottie-react-native';
 import '../assets/style/global.css';
 import Logo from '../components/logo';
-import React from 'react';
+import React, { useEffect } from 'react';
 import ButtonComponent from '@/components/button';
 
 export default function HomeScreen() {
+
+  useEffect(() => {
+    
+    setTimeout(() => {
+      router.push('/auth/generator');
+    }, 2000);
+  }, []);
   
   return (
     <View className="flex-1  items-center bg-white w-full">
