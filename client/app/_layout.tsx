@@ -13,10 +13,10 @@ export default function RootLayout() {
         <Stack.Screen name="index" />
         <Stack.Screen name="(screens)/public/login" />
         <Stack.Screen name="(screens)/public/register" />
-        <Stack.Screen name="(screens)/auth/safe" />
-        <Stack.Screen name="(screens)/auth/generator" />
-        <Stack.Screen name="(screens)/auth/checkup" />
-        <Stack.Screen name="(screens)/auth/profile" />
+        <Stack.Screen name="(tabs)/auth/safe" />
+        <Stack.Screen name="(tabs)/auth/generator" />
+        <Stack.Screen name="(tabs)/auth/checkup" />
+        <Stack.Screen name="(tabs)/auth/profile" />
       </Stack>
     </Template>
   );
