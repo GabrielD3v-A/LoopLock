@@ -1,7 +1,6 @@
 import React from 'react'
 import { StatusBar, View, Text } from 'react-native';
-import MenuWrapper from './MenuWrapper';
-import Menu from './menu';
+
 
 interface TemplateProps {
     children: React.ReactNode;
