@@ -25,13 +25,14 @@ const SlidersComponent: React.FC<SlidersComponentProps> = ({ value, onChange }) 
       <View style={[styles.contentView]}>
         <Slider
           step={1}
-          minimumValue={1}
+          minimumValue={0}
           maximumValue={100}
           value={value}
           onValueChange={onChange}
           style={styles.slider}
           minimumTrackTintColor={color()}
-          maximumTrackTintColor="#000000"
+          maximumTrackTintColor="#ccc"
+          thumbTintColor={color()}
         />
         <Text style={{ paddingTop: 20 }}>Tamanho: {value}</Text>
       </View>

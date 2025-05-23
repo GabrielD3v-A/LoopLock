@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, TextInput } from 'react-native';
 import SlidersComponent from '@/components/slider';
 import Checkbox from 'expo-checkbox';
+import * as Clipboard from 'expo-clipboard';
 
 export default function Generator() {
   const [checkedYesAmbiguous, setCheckedYesAmbiguous] = useState(false);
@@ -57,19 +58,53 @@ export default function Generator() {
       generatedPassword += charset[randomIndex];
     }
   
+    
+
     setPasswordGenerate(generatedPassword);
     setIsLoading(false);
   };
+
+  const getTextSizeClass = () => {
+    if (sliderValue > 20) return 'text-xs';
+    if (sliderValue > 12) return 'text-sm';
+    return 'text-base';
+  };
   
-  
+  const copyToClipboard = async () => {
+    await Clipboard.setStringAsync(passwordgenerate);
+    alert('Senha copiada para a área de transferência!');
+  };
+
 
 
   return (
     <View className='flex-1 items-center justify-center'>
       <Text className='text-2xl font-bold'>Gerador de Senhas</Text>
 
-      <View className='w-full flex flex-column items-center justify-between my-5 border-b-2 border-lp-blue'>
-        <Text className='text-lg font-bold'>{passwordgenerate}</Text>
+      <View className='w-full h-14 flex flex-row items-center justify-between my-5 border-b-2 border-lp-blue'>
+        <View className='w-4/5 ' >
+          <TextInput numberOfLines={1}  placeholder={passwordgenerate} placeholderTextColor={'03045E'} keyboardType={'default'} editable={false} secureTextEntry={true} className={`font-bold text-left px-4 whitespace-nowrap text-lp-blue ${getTextSizeClass()}`}/>
+          {/* <Text numberOfLines={1}  ellipsizeMode="tail" className={`font-bold text-left px-4 whitespace-nowrap ${getTextSizeClass()}`}>
+            {passwordgenerate}
+          </Text> */}
+        </View>
+        
+        <View className='w-1/6 flex flex-row items-center justify-center absolute right-0 gap-x-1 px-2'>
+          <TouchableOpacity
+              onPress={() => {
+                copyToClipboard();
+              }}
+            >
+              <Image source={require('../../../assets/images/icons/copy-icon.png')} style={{ width: 28, height: 28 }} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                handlePress();
+              }}
+            >
+              <Image source={require('../../../assets/images/icons/generate-icon-function.png')} style={{ width: 28, height: 28 }} />
+            </TouchableOpacity>
+        </View>
       </View>
 
 
