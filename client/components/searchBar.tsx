@@ -1,15 +1,56 @@
-import React from 'react';
-import { StyleSheet, TextInput, View, Image } from 'react-native';
+import React, { useRef, useEffect, useState } from 'react';
+import { TouchableWithoutFeedback } from 'react-native';
+import { TextInput, View, Image, Keyboard, KeyboardEvent } from 'react-native';
 
 const SearchBar = () => {
-    return (
-        <View className='flex flex-row items-center justify-between w-full px-2 py-1 bg-[#CBCCF5] rounded-full  border-white box-border' style={{ height: 40, borderWidth: 1, borderColor: '#fff' }}>
-            <Image source={require('../assets/images/icons/search-icon.png')} style={{ width: 22, height: 22 }} />
-            <TextInput placeholder="" className='h-full w-full bg-transparent text-white px-2' placeholderTextColor={'#fff'}  multiline={true} maxLength={100}/>
-        </View>
-    );
-}
+  const inputRef = useRef<TextInput>(null);
+  const [text, setText] = useState('');
 
-const styles = StyleSheet.create({})
+  // Remove o foco quando o teclado é fechado
+  useEffect(() => {
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      inputRef.current?.blur();
+    });
+
+    return () => {
+      hideSubscription.remove();
+    };
+  }, []);
+
+  const handleChangeText = (value: string) => {
+    setText(value);
+    if (value.trim() === '') {
+      inputRef.current?.blur();
+      Keyboard.dismiss();
+    }
+  };
+
+  const handleSubmit = () => {
+    inputRef.current?.blur();
+    Keyboard.dismiss();
+  };
+
+  const handleFocus = () => {
+    inputRef.current?.focus();
+  };
+
+  return (
+    <TouchableWithoutFeedback onPress={handleFocus}>
+        <View className="flex flex-row items-center rounded-full border border-white box-border w-48 h-12 px-2 bg-lp-lilas">
+            <Image source={require('../assets/images/icons/search-icon.png')} className="w-6 h-6" />
+            <TextInput
+                ref={inputRef}
+                placeholder=""
+                className="text-white w-10/12 h-full text-xs "
+                placeholderTextColor="#fff"
+                multiline={false}
+                value={text}
+                onChangeText={handleChangeText}
+                onSubmitEditing={handleSubmit}
+            />
+        </View>
+    </TouchableWithoutFeedback>
+  );
+};
 
 export default SearchBar;

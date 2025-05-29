@@ -7,13 +7,13 @@ const Header = () => {
     const [searchQuery, setSearchQuery] = React.useState('');
 
     return (
-        <View style={{ height: 80 }}  className='fixed w-full top-0 left-0 bg-lp-blue flex flex-row items-center justify-between  px-4  z-10 py-10 rounded-b-3xl'>
-            <View className='flex items-start justify-end w-3/12'>
+        <View  className='fixed w-screen h-24 top-0 left-0 bg-lp-blue flex flex-row items-center justify-between px-4  z-10 py-2 rounded-b-3xl box-content'>
+            <View className='flex items-center'>
                 <Logo />
             </View>
-            <View className='flex flex-row items-center justify-between w-9/12 gap-x-8'>
-                <View className='w-40 h-5'><SearchBar /></View>
-                <Image source={require('@/assets/images/icons/user-icon.png')} style={{ width: 40, height: 40 }} />
+            <View className='flex flex-row items-center justify-between w-auto h-full gap-x-2'>
+                <SearchBar />
+                <Image source={require('@/assets/images/icons/user-icon.png')} className='w-12 h-12' />
             </View>
         </View>
     );
