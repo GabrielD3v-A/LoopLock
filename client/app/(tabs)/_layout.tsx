@@ -1,6 +1,6 @@
 import Header from '@/components/header';
 import { Tabs } from 'expo-router';
-import { Image, View } from 'react-native';
+import { Image, View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AuthLayout() {
@@ -13,20 +13,25 @@ export default function AuthLayout() {
             headerShown: false,
             tabBarStyle: {
               backgroundColor: '#03045E',
-              height: 70,
+              height: 78,
+              paddingTop: 10,
             },
           }}
         >
           <Tabs.Screen
             name="auth/safe"
             options={{
-              title: 'Cofre',
-              tabBarIcon: () => (
+              tabBarLabel: ({focused}) => (
+                <Text className='text-white text-[8px] text-center' style={{ opacity: focused ? 1 : 0.5 }} >
+                  Cofre
+                </Text>
+              ),
+              tabBarIcon: ({ focused }) => (
                 <Image
                   source={
                     require('../../assets/images/icons/safe-icon.png')
                   }
-                  style={{ width: 24, height: 24 }}
+                  style={{ width: 32, height: 32, marginBottom: 5, opacity: focused ? 1 : 0.5 }}
                   resizeMode="contain"
                 />
               ),
@@ -35,13 +40,17 @@ export default function AuthLayout() {
           <Tabs.Screen
             name="auth/checkup"
             options={{
-              title: 'Check-up',
-              tabBarIcon: () => (
+              tabBarLabel: ({focused}) => (
+                <Text className='text-white text-[8px] text-center' style={{ opacity: focused ? 1 : 0.5 }} >
+                  Check-up
+                </Text>
+              ),
+              tabBarIcon:({ focused }) => (
                 <Image
                   source={
                     require('../../assets/images/icons/checkup-icon.png')
                   }
-                  style={{ width: 24, height: 24 }}
+                  style={{ width: 32, height: 32, marginBottom: 5, opacity: focused ? 1 : 0.5 }}
                   resizeMode="contain"
                 />
               ),
@@ -50,28 +59,34 @@ export default function AuthLayout() {
           <Tabs.Screen
             name="auth/create-credencial"
             options={{
-              title: 'New',
+              title: '',
               tabBarIcon: () => (
-                <Image
-                  source={
-                    require('../../assets/images/icons/new-icon.png')
-                  }
-                  style={{ width: 24, height: 24 }}
-                  resizeMode="contain"
-                />
+                <View className='flex items-center justify-center rounded-full bg-lp-lightblue w-24 h-24' >
+                  <Image
+                    source={
+                      require('../../assets/images/icons/new-icon.png')
+                    }
+                    style={{ width: 50, height: 50 }}
+                    resizeMode="contain"
+                  />
+                </View>
               ),
             }}
           />
           <Tabs.Screen
             name="auth/generator"
             options={{
-              title: 'Gerador de senha',
-              tabBarIcon: () => (
+              tabBarLabel: ({focused}) => (
+                <Text className='text-white text-[8px] text-center' style={{ opacity: focused ? 1 : 0.5 }} >
+                  Gerador {'\n'}de Senha
+                </Text>
+              ),
+              tabBarIcon:({ focused }) => (
                 <Image
                   source={
                     require('../../assets/images/icons/generate-icon.png')
                   }
-                  style={{ width: 24, height: 24 }}
+                  style={{ width: 32, height: 32, marginBottom: 5, opacity: focused ? 1 : 0.5 }}
                   resizeMode="contain"
                 />
               ),
@@ -80,13 +95,20 @@ export default function AuthLayout() {
           <Tabs.Screen
             name="auth/profile"
             options={{
-              title: 'Config',
-              tabBarIcon: () => (
+              tabBarLabel: ({focused}) => (
+                <Text className='text-white text-[8px] text-center' style={{ opacity: focused ? 1 : 0.5 }} >
+                  Config
+                </Text>
+              ),
+              tabBarLabelStyle: {
+                fontSize: 8,
+              },
+              tabBarIcon:({ focused }) => (
                 <Image
                   source={
                     require('../../assets/images/icons/config-icon.png')
                   }
-                  style={{ width: 24, height: 24 }}
+                  style={{ width: 32, height: 32, marginBottom: 5, opacity: focused ? 1 : 0.5 }}
                   resizeMode="contain"
                 />
               ),
