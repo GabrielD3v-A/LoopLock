@@ -6,19 +6,17 @@ import * as Clipboard from 'expo-clipboard';
 
 export default function Generator() {
   const [checkedYesAmbiguous, setCheckedYesAmbiguous] = useState(false);
-  const [checkedNotAmbiguous, setCheckedNotAmbiguous] = useState(false);
+  const [checkedNotAmbiguous, setCheckedNotAmbiguous] = useState(true);
   const [checkedSpecial, setCheckedSpecial] = useState(false);
-  const [checkedNumber, setCheckedNumber] = useState(false);
-  const [checkedLowercase, setCheckedLowercase] = useState(false);
+  const [checkedNumber, setCheckedNumber] = useState(true);
+  const [checkedLowercase, setCheckedLowercase] = useState(true);
   const [checkedUpperrcase, setCheckedUpperrcase] = useState(false);
 
-  const [isLoading, setIsLoading] = useState(false); // Estado de carregamento
-  const [passwordgenerate, setPasswordGenerate] = useState('vazia'); // Estado para a senha gerada
+  const [passwordgenerate, setPasswordGenerate] = useState('Sua nova senha...'); // Estado para a senha gerada
 
   const [sliderValue, setSliderValue] = useState(8); // ou qualquer valor inicial
 
   const handlePress = () => {
-    setIsLoading(true);
   
     const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
@@ -32,6 +30,11 @@ export default function Generator() {
     if (checkedLowercase) charset += lowercaseChars;
     if (checkedNumber) charset += numberChars;
     if (checkedSpecial) charset += specialChars;
+
+    if(!checkedNotAmbiguous && !checkedYesAmbiguous) {
+      setCheckedNotAmbiguous(true);
+      return;
+    }
   
     // Ambíguos SIM
     if (checkedYesAmbiguous) {
@@ -48,7 +51,6 @@ export default function Generator() {
     // Validação: se nada for marcado
     if (charset.length === 0) {
       alert('Selecione pelo menos um tipo de caractere.');
-      setIsLoading(false);
       return;
     }
   
@@ -61,12 +63,12 @@ export default function Generator() {
     
 
     setPasswordGenerate(generatedPassword);
-    setIsLoading(false);
   };
 
   const getTextSizeClass = () => {
     if (sliderValue > 20) return 'text-xs';
     if (sliderValue > 12) return 'text-sm';
+    if (passwordgenerate.length >= 100) 'text-xs';
     return 'text-base';
   };
   
@@ -160,12 +162,12 @@ export default function Generator() {
           <Text className='text-center text-lp-blue text-base font-medium my-2' style={{ fontFamily:'Montserrat-Medium' }}>Características da senha </Text>
 
           <View className='w-full flex flex-row items-start justify-between bg-lp-lilas shadow-xl rounded-full p-4'>
-            <Text className='text-lp-blue text-sm' style={{ fontFamily:'Montserrat-Light' }}>Caracteres especiais (!@#$%^&*)</Text>
+            <Text className='text-lp-blue text-sm' style={{ fontFamily:'Montserrat-Light' }}>Letras minúsculas (a-z)</Text>
             <Checkbox
               style={styles.checkbox}
-              value={checkedSpecial} // Vinculado ao estado do pai
-              onValueChange={setCheckedSpecial}
-              color={checkedSpecial ? '#03045E' : undefined}
+              value={checkedLowercase} // Vinculado ao estado do pai
+              onValueChange={setCheckedLowercase}
+              color={checkedLowercase ? '#03045E' : undefined}
             />
           </View>
 
@@ -178,15 +180,7 @@ export default function Generator() {
               color={checkedUpperrcase ? '#03045E' : undefined}
             />
           </View>
-          <View className='w-full flex flex-row items-start justify-between bg-lp-lilas shadow-xl rounded-full p-4'>
-            <Text className='text-lp-blue text-sm' style={{ fontFamily:'Montserrat-Light' }}>Letras minúsculas (a-z)</Text>
-            <Checkbox
-              style={styles.checkbox}
-              value={checkedLowercase} // Vinculado ao estado do pai
-              onValueChange={setCheckedLowercase}
-              color={checkedLowercase ? '#03045E' : undefined}
-            />
-          </View>
+
           <View className='w-full flex flex-row items-start justify-between bg-lp-lilas shadow-xl rounded-full p-4'>
             <Text className='text-lp-blue text-sm' style={{ fontFamily:'Montserrat-Light' }}>Números (1-9)</Text>
             <Checkbox
@@ -196,7 +190,18 @@ export default function Generator() {
               color={checkedNumber ? '#03045E' : undefined}
             />
           </View>
+
+          <View className='w-full flex flex-row items-start justify-between bg-lp-lilas shadow-xl rounded-full p-4'>
+              <Text className='text-lp-blue text-sm' style={{ fontFamily:'Montserrat-Light' }}>Caracteres especiais (!@#$%^&*)</Text>
+              <Checkbox
+                style={styles.checkbox}
+                value={checkedSpecial} // Vinculado ao estado do pai
+                onValueChange={setCheckedSpecial}
+                color={checkedSpecial ? '#03045E' : undefined}
+              />
+            </View>
         </View>
+
 
       </View>
 
