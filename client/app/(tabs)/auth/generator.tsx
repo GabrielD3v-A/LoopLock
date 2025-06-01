@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, TextInput } from 'react-native';
 import SlidersComponent from '@/components/slider';
 import Checkbox from 'expo-checkbox';
@@ -15,6 +15,11 @@ export default function Generator() {
   const [passwordgenerate, setPasswordGenerate] = useState('Sua nova senha...'); // Estado para a senha gerada
 
   const [sliderValue, setSliderValue] = useState(8); // ou qualquer valor inicial
+
+
+  useEffect(() => {
+    getTextSizeClass();
+  }, [sliderValue])
 
   const handlePress = () => {
   
@@ -65,11 +70,14 @@ export default function Generator() {
     setPasswordGenerate(generatedPassword);
   };
 
-  const getTextSizeClass = () => {
+  const getTextSizeClass = () => { 
     if (sliderValue > 20) return 'text-xs';
     if (sliderValue > 12) return 'text-sm';
-    if (passwordgenerate.length >= 100) 'text-xs';
-    return 'text-base';
+    if (sliderValue < 20 && passwordgenerate.length > 20){
+      return 'text-xs';
+    }else{
+      return 'text-base';
+    }
   };
   
   const copyToClipboard = async () => {
