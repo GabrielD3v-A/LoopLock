@@ -78,118 +78,128 @@ export default function Generator() {
 
 
   return (
-    <View className='flex-1 items-center justify-center bg-white'>
-      <Text className='text-2xl font-bold'>Gerador de Senhas</Text>
+    <View className='flex-1 items-center justify-start bg-white px-8 gap-y-1'>
+      <View className='w-full flex items-center justify-center'>
+        <Text className='text-3xl font-normal text-lp-blue mt-10' style={{ fontFamily: 'Montserrat-Regular' }}>Password Generator</Text>
+        <Text className='text-xs font-light text-center text-lp-blue mb-6'style={{ fontFamily: 'Montserrat-Light' }} >Crie senhas mais elaboradas com a Loop Lock.</Text>
+        <Text className='text-xsm font-normal text-center text-lp-blue mb-2' style={{ fontFamily: 'Montserrat-Regular' }}>Selecione as especificações da sua senha</Text>
+      </View>
 
-      <View className='w-full h-14 flex flex-row items-center justify-between my-5 border-b-2 border-lp-blue'>
-        <View className='w-4/5 ' >
-          <TextInput numberOfLines={1}  placeholder={passwordgenerate} placeholderTextColor={'03045E'} keyboardType={'default'} editable={false} secureTextEntry={true} className={`font-bold text-left px-4 whitespace-nowrap text-lp-blue ${getTextSizeClass()}`}/>
-          {/* <Text numberOfLines={1}  ellipsizeMode="tail" className={`font-bold text-left px-4 whitespace-nowrap ${getTextSizeClass()}`}>
-            {passwordgenerate}
-          </Text> */}
-        </View>
-        
-        <View className='w-1/6 flex flex-row items-center justify-center absolute right-0 gap-x-1 px-2'>
-          <TouchableOpacity
-              onPress={() => {
-                copyToClipboard();
-              }}
-            >
-              <Image source={require('../../../assets/images/icons/copy-icon.png')} style={{ width: 28, height: 28 }} />
-            </TouchableOpacity>
+      <View className='w-full h-auto mx-auto bg-lp-lilas-3 rounded-2xl p-4 flex flex-col items-center justify-between '>
+
+        <View className='w-full h-auto flex flex-row items-center justify-between my-1 border-b border-lp-blue py-1'>
+          <View className='w-4/5' >
+            <Text className={`w-full font-bold text-left whitespace-nowrap text-lp-blue ${getTextSizeClass()}`} style={{ fontFamily: 'Montserrat-Medium' }}  >{passwordgenerate}</Text>
+          </View>
+          
+          <View className='w-1/6 flex flex-row items-center justify-center gap-x-1'>
             <TouchableOpacity
-              onPress={() => {
-                handlePress();
-              }}
-            >
-              <Image source={require('../../../assets/images/icons/generate-icon-function.png')} style={{ width: 28, height: 28 }} />
-            </TouchableOpacity>
-        </View>
-      </View>
-
-
-      <TouchableOpacity
-        style={[styles.button, isLoading && styles.buttonDisabled]}
-        onPress={handlePress}
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <ActivityIndicator color="#FFF" />
-        ) : (
-          <Text style={styles.text}>Gerar</Text>
-        )}
-      </TouchableOpacity>
-
-      <SlidersComponent value={sliderValue} onChange={setSliderValue} />
-
-      <View className='w-full flex flex-column items-center justify-between my-5'>
-        <Text className='text-lg font-bold'>Deseja carecteres ambíguos ?</Text>
-        <View className='flex flex-row items-center gap-x-2'>
-          <View>
-            <Checkbox
-              style={styles.checkbox}
-              value={checkedYesAmbiguous}
-              onValueChange={(newValue) => {
-                setCheckedYesAmbiguous(newValue);
-                if (newValue) setCheckedNotAmbiguous(false);
-              }}
-              color={checkedYesAmbiguous ? '#03045E' : undefined}
-            />
-            <Text>Sim</Text>
-          </View>
-
-          <View>
-            <Checkbox
-              style={styles.checkbox}
-              value={checkedNotAmbiguous}
-              onValueChange={(newValue) => {
-                setCheckedNotAmbiguous(newValue);
-                if (newValue) setCheckedYesAmbiguous(false);
-              }}
-              color={checkedNotAmbiguous ? '#03045E' : undefined}
-            />
-            <Text>Não</Text>
+                onPress={() => {
+                  copyToClipboard();
+                }}
+              >
+                <Image source={require('../../../assets/images/icons/copy-icon.png')} className='w-9 h-9' />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  handlePress();
+                }}
+              >
+                <Image source={require('../../../assets/images/icons/generate-icon-function.png')} className='w-9 h-9' />
+              </TouchableOpacity>
           </View>
         </View>
+
+        <TouchableOpacity
+          className='flex items-center justify-center w-44 bg-lp-lightblue py-1 rounded-full my-4'
+          onPress={handlePress}>
+          <Text className='text-white font-medium text-lg' style={{ fontFamily: 'Montserrat-Medium' }}>Gerar</Text>
+        </TouchableOpacity>
+
+        <View className='w-full flex flex-row items-start justify-between my-3'>
+          <View className='w-1/2'>
+            <SlidersComponent value={sliderValue} onChange={setSliderValue} />
+          </View>
+
+          <View className='w-1/2 flex flex-column items-center justify-between gap-y-2'>
+
+            <Text className='text-center text-lp-blue text-[9px]' style={{ fontFamily:'Montserrat-Medium' }}>Deseja carecteres ambíguos ?</Text>
+
+            <View className='w-full flex flex-row items-center justify-around'>
+              <View className='flex flex-row items-center justify-center gap-x-1'>
+                <Checkbox
+                  style={styles.checkbox}
+                  value={checkedYesAmbiguous}
+                  onValueChange={(newValue) => {
+                    setCheckedYesAmbiguous(newValue);
+                    if (newValue) setCheckedNotAmbiguous(false);
+                  }}
+                  color={checkedYesAmbiguous ? '#03045E' : undefined}
+                />
+                <Text className='text-left text-lp-blue text-sm' style={{ fontFamily:'Montserrat-Light' }}>Sim</Text>
+              </View>
+
+              <View className='flex flex-row items-center justify-center gap-x-1'>
+                <Checkbox
+                  style={styles.checkbox}
+                  value={checkedNotAmbiguous}
+                  onValueChange={(newValue) => {
+                    setCheckedNotAmbiguous(newValue);
+                    if (newValue) setCheckedYesAmbiguous(false);
+                  }}
+                  color={checkedNotAmbiguous ? '#03045E' : undefined}
+                />
+                <Text className='text-left text-lp-blue text-sm' style={{ fontFamily:'Montserrat-Light' }}>Não</Text>
+              </View>
+            </View>
+          </View>
+                
+        </View>        
+
+        <View className='w-full flex flex-col items-center justify-center gap-y-2'>
+          <Text className='text-center text-lp-blue text-base font-medium my-2' style={{ fontFamily:'Montserrat-Medium' }}>Características da senha </Text>
+
+          <View className='w-full flex flex-row items-start justify-between bg-lp-lilas shadow-xl rounded-full p-4'>
+            <Text className='text-lp-blue text-sm' style={{ fontFamily:'Montserrat-Light' }}>Caracteres especiais (!@#$%^&*)</Text>
+            <Checkbox
+              style={styles.checkbox}
+              value={checkedSpecial} // Vinculado ao estado do pai
+              onValueChange={setCheckedSpecial}
+              color={checkedSpecial ? '#03045E' : undefined}
+            />
+          </View>
+
+          <View className='w-full flex flex-row items-start justify-between bg-lp-lilas shadow-xl rounded-full p-4'>
+            <Text className='text-lp-blue text-sm' style={{ fontFamily:'Montserrat-Light' }}>Letras maiúsculas (A-Z)</Text>
+            <Checkbox
+              style={styles.checkbox}
+              value={checkedUpperrcase} // Vinculado ao estado do pai
+              onValueChange={setCheckedUpperrcase}
+              color={checkedUpperrcase ? '#03045E' : undefined}
+            />
+          </View>
+          <View className='w-full flex flex-row items-start justify-between bg-lp-lilas shadow-xl rounded-full p-4'>
+            <Text className='text-lp-blue text-sm' style={{ fontFamily:'Montserrat-Light' }}>Letras minúsculas (a-z)</Text>
+            <Checkbox
+              style={styles.checkbox}
+              value={checkedLowercase} // Vinculado ao estado do pai
+              onValueChange={setCheckedLowercase}
+              color={checkedLowercase ? '#03045E' : undefined}
+            />
+          </View>
+          <View className='w-full flex flex-row items-start justify-between bg-lp-lilas shadow-xl rounded-full p-4'>
+            <Text className='text-lp-blue text-sm' style={{ fontFamily:'Montserrat-Light' }}>Números (1-9)</Text>
+            <Checkbox
+              style={styles.checkbox}
+              value={checkedNumber} // Vinculado ao estado do pai
+              onValueChange={setCheckedNumber}
+              color={checkedNumber ? '#03045E' : undefined}
+            />
+          </View>
+        </View>
+
       </View>
 
-      <View>
-        <Checkbox
-          style={styles.checkbox}
-          value={checkedSpecial} // Vinculado ao estado do pai
-          onValueChange={setCheckedSpecial}
-          color={checkedSpecial ? '#03045E' : undefined}
-        />
-        <Text>Caracteres especiais (!@#$%^&*)</Text>
-      </View>
-
-      <View>
-        <Checkbox
-          style={styles.checkbox}
-          value={checkedUpperrcase} // Vinculado ao estado do pai
-          onValueChange={setCheckedUpperrcase}
-          color={checkedUpperrcase ? '#03045E' : undefined}
-        />
-        <Text>Letras maiúsculas (A-Z)</Text>
-      </View>
-      <View>
-        <Checkbox
-          style={styles.checkbox}
-          value={checkedLowercase} // Vinculado ao estado do pai
-          onValueChange={setCheckedLowercase}
-          color={checkedLowercase ? '#03045E' : undefined}
-        />
-        <Text>Letras minúsculas (a-z)</Text>
-      </View>
-      <View>
-        <Checkbox
-          style={styles.checkbox}
-          value={checkedNumber} // Vinculado ao estado do pai
-          onValueChange={setCheckedNumber}
-          color={checkedNumber ? '#03045E' : undefined}
-        />
-        <Text>Números (1-9)</Text>
-      </View>
 
     </View>
 
@@ -198,32 +208,14 @@ export default function Generator() {
 }
 
 
-const styles = StyleSheet.create({
-    
+const styles = StyleSheet.create({  
     checkbox: {
-        width: 22,
-        height: 22,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 4,
-        borderWidth: 1.5,
-        backgroundColor: '#CBCCF5',
-    },
-    button: {
-      display: 'flex',
-      alignItems: 'center',
+      width: 24,
+      height: 24,
       justifyContent: 'center',
-      width: '100%',
-      backgroundColor: '#00B4D8',
-      paddingVertical: 8,
-      borderRadius: 50,
-    },
-    buttonDisabled: {
+      alignItems: 'center',
+      borderRadius: 4,
+      borderWidth: 1,
       backgroundColor: '#CBCCF5',
-    },
-    text: {
-      color: 'white',
-      fontSize: 14,
-      fontFamily: 'montserrat'
     },
   });

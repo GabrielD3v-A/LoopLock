@@ -21,8 +21,10 @@ const SlidersComponent: React.FC<SlidersComponentProps> = ({ value, onChange }) 
 
   return (
     <>
-      <Text style={styles.subHeader}>Tamanho da senha</Text>
-      <View style={[styles.contentView]}>
+      <View className='flex flex-col justify-center items-center '>
+        <Text className='text-center text-lp-blue text-[9px]' style={{ fontFamily:'Montserrat-Medium' }}>
+          Quantidade de caracteres
+        </Text>
         <Slider
           step={1}
           minimumValue={0}
@@ -34,7 +36,7 @@ const SlidersComponent: React.FC<SlidersComponentProps> = ({ value, onChange }) 
           maximumTrackTintColor="#ccc"
           thumbTintColor={color()}
         />
-        <Text style={{ paddingTop: 20 }}>Tamanho: {value}</Text>
+        <Text className='text-center text-lp-blue text-[9px]' style={{ fontFamily:'Montserrat-Light' }}>{value} caracteres</Text>
       </View>
     </>
   );
@@ -44,20 +46,7 @@ const styles = StyleSheet.create({
   slider: {
     width: '100%',
     opacity: 1,
-    marginTop: 10,
-  },
-  contentView: {
-    padding: 20,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'stretch',
-  },
-  subHeader: {
-    backgroundColor: '#2089dc',
-    color: 'white',
-    textAlign: 'center',
-    paddingVertical: 5,
-    marginBottom: 10,
+    marginVertical: 5,
   },
 });
 

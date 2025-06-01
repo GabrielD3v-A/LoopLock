@@ -10,6 +10,7 @@ module.exports = {
         'lp-blue-2': '#023E8A',
         'lp-lightblue': '#00B4D8',
         'lp-lilas': '#CBCCF5',
+        'lp-lilas-2': '#DEDFFC',
         'lp-lilas-3': '#E8E9FA',
       },
     },

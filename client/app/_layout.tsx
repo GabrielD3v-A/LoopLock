@@ -14,6 +14,7 @@ export default function RootLayout() {
   const [loaded, error] = useFonts({
     'Montserrat-Bold': require("../assets/fonts/Montserrat/static/Montserrat-Bold.ttf"),
     'Montserrat-Regular': require("../assets/fonts/Montserrat/static/Montserrat-Regular.ttf"),
+    'Montserrat-Medium': require("../assets/fonts/Montserrat/static/Montserrat-Medium.ttf"),
     'Montserrat-Light': require("../assets/fonts/Montserrat/static/Montserrat-Light.ttf"),
     'Montserrat-Italic': require("../assets/fonts/Montserrat/static/Montserrat-Italic.ttf"),
     'Fellix-Light': require("../assets/fonts/Fellix/Fellix-Light.ttf"),
