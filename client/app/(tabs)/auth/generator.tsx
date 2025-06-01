@@ -78,7 +78,7 @@ export default function Generator() {
 
 
   return (
-    <View className='flex-1 items-center justify-center'>
+    <View className='flex-1 items-center justify-center bg-white'>
       <Text className='text-2xl font-bold'>Gerador de Senhas</Text>
 
       <View className='w-full h-14 flex flex-row items-center justify-between my-5 border-b-2 border-lp-blue'>
