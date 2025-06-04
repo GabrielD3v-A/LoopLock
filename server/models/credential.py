@@ -8,9 +8,6 @@ import secrets
 from db.db import db
 from models.user import User
 
-# python-slugify
-from slugify import slugify
-
 # cryptography
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
@@ -122,7 +119,7 @@ class Credential(db.Model):
     def generate_slug(self, *fields):
 
         # Gera o hash em cima da slug com os campos fornecidos
-        slug = hashlib.sha1(slugify("".join(str(field) for field in fields)).encode('utf-8')).hexdigest()
+        slug = hashlib.sha1("".join(str(field) for field in fields).encode('utf-8')).hexdigest()
         self.credential_slug = slug
 
     @classmethod
