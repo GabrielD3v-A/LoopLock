@@ -13,6 +13,9 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
 
+# zxcvbn-python
+from zxcvbn import zxcvbn
+
 class Credential(db.Model):
     __tablename__ = 'credential'
 
@@ -91,7 +94,7 @@ class Credential(db.Model):
             binascii.hexlify(iv).decode('utf-8') # Vetor de inicialização em formato String
         )
 
-    def decrypt_data(self, credencial_field: str, symetric_key: str):
+    def decrypt_data(self, credencial_field: str, symetric_key: str) -> str:
 
         # Converte a chave protegida, o campo protegido  e o vetor de inicialização em suas formas binárias para operar a criptografia
         symetric_key = binascii.unhexlify(symetric_key)
@@ -132,6 +135,17 @@ class Credential(db.Model):
             credential_slug=credential_slug,
             user_id=None
         )
+    
+    @classmethod
+    def init_select_checkup(cls, credential_name, credential_password, credential_slug) -> list[str,str,str]:
+        return cls(
+            credential_name = credential_name,
+            credential_username=None,
+            credential_password=credential_password,
+            credential_domain=None,
+            credential_slug=credential_slug,
+            user_id=None
+        )
 
     @classmethod
     def get_credential_by_name(cls, name):
@@ -145,11 +159,30 @@ class Credential(db.Model):
     def get_all_credentials(cls, identity):
         return (
             cls.query
-            .with_entities(Credential.credential_name, Credential.credential_slug)
+            .with_entities(Credential.credential_name, Credential.credential_password, Credential.credential_slug)
             .select_from(User)
             .join(Credential, User.user_id == Credential.user_id)
             .filter(User.user_email.like(f"%{identity}%"))
             .all()
+        )
+    
+    # Avalia a senha da credencial cadastrada com a biblioteca zxcvbn para analisar a segurança
+    def checkup_credential(self, credencial_password: str, symetric_key: str) -> tuple[str,str]:
+
+        # Decripta a senha
+        credential_password = self.decrypt_data(credencial_password, symetric_key)
+
+        # Realiza uma análise da senha
+        checked_password = zxcvbn(credential_password)
+
+        # keys principais do retorno da análise
+        score = checked_password["score"] # 0–4. É o nível de segurança que o algoritmo classificou
+        warning = checked_password["feedback"]["warning"]  # Aviso geral do motivo do score
+
+        # Retorno do score e warning
+        return (
+            str(score),
+            str(warning)
         )
     
     # Função para forçar a operação do banco de dados antes de commitar para gerar a slug a partir do ID

@@ -105,11 +105,65 @@ def select_all_credentials():
 
             credential_inst = Credential.init_select( # Utiliza um método de classe apenas para obter as informações necessárias para exibição
                 credential_name=credential[0],
-                credential_slug=credential[1]
+                credential_slug=credential[2]
             )
 
+            # Monta o retorno da requisição
             credential_data = {
                 'credential_name': credential_inst.decrypt_data(credential_inst.credential_name, symetric_key), # Decripta o nome da credencial
+                'credential_slug': credential_inst.credential_slug
+            }
+
+            # Adiciona o dado na lista
+            credential_json_list.append(credential_data)
+        
+        #Devolve todas as credenciais num objeto json com uma lista de cada credencial também em um objeto json
+        return jsonify({'credentials': credential_json_list}), 200
+    
+    # Tratamento de exceções
+    except Exception as e:
+        return jsonify({'message': f'Erro: {str(e)}'}), 500
+    
+# Rota para visualizar todas as credenciais e o nível de segurança delas
+@credential.route('/credential/select_all_checkup', methods=['GET'])
+@jwt_required()
+def select_all_checkup():
+
+    # Recupera a chave simétrica
+    data = request.get_json()
+    symetric_key = data.get('symetric_key')
+
+    try:
+        # Recupera a identidade definida no token (email)
+        identity = get_jwt_identity()
+
+        # Procura o usuário no banco de dados
+        user_id = User.get_user_id_by_email(identity)
+        if not user_id:
+            return jsonify({'message': 'Usuário não encontrado.'}), 404
+        
+        # Busca todas as credenciais do usuário da sessão
+        credential_list = Credential.get_all_credentials(identity)
+
+        # Prepara a lista para arranjar todas as credenciais e enviar na resposta
+        credential_json_list = []
+        for credential in credential_list:
+
+            credential_inst = Credential.init_select_checkup( # Utiliza um método de classe apenas para obter as informações necessárias para exibição
+                credential_name=credential[0],
+                credential_password=credential[1],
+                credential_slug=credential[2]   
+            )
+
+            # Retorna o status de segurança da credencial e o ponto de melhoria possível se aplicável
+            credential_checkup_status, credential_checkup_suggestion = credential_inst.checkup_credential(credential_inst.credential_password, symetric_key)
+
+            # Monta o retorno da requisição
+            credential_data = {
+                'credential_name': credential_inst.decrypt_data(credential_inst.credential_name, symetric_key), # Decripta o nome da credencial
+                'credential_password': credential_inst.decrypt_data(credential_inst.credential_password, symetric_key), # Decripta a senha da credencial
+                'credential_checkup_status': credential_checkup_status,
+                'credential_checkup_suggestion': credential_checkup_suggestion,
                 'credential_slug': credential_inst.credential_slug
             }
 
