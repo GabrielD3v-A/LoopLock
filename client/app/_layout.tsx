@@ -17,6 +17,7 @@ export default function RootLayout() {
     'Montserrat-Medium': require("../assets/fonts/Montserrat/static/Montserrat-Medium.ttf"),
     'Montserrat-Light': require("../assets/fonts/Montserrat/static/Montserrat-Light.ttf"),
     'Montserrat-Italic': require("../assets/fonts/Montserrat/static/Montserrat-Italic.ttf"),
+    'Montserrat-Thin': require("../assets/fonts/Montserrat/static/Montserrat-Thin.ttf"),
     'Fellix-Light': require("../assets/fonts/Fellix/Fellix-Light.ttf"),
     'Fellix-Medium': require("../assets/fonts/Fellix/Fellix-Medium.ttf"),
     'Fellix-Bold': require("../assets/fonts/Fellix/Fellix-Bold.ttf"),

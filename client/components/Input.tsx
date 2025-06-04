@@ -24,7 +24,7 @@ const InputComponent: React.FC<InputComponentProps> = ({ textPlaceholder, icon, 
     };
 
     return (
-        <View className='w-full  font-montserrat text-lp-blue text-base border border-lp-blue mb-3 px-2 bg-black flex flex-row items-center'>
+        <View className='w-full font-montserrat text-lp-blue text-base flex flex-row items-center'>
             <TextInput numberOfLines={1} style={styles.CustomStyleInput} placeholder={textPlaceholder} placeholderTextColor="#03045E" keyboardType={'default'}  secureTextEntry={isPasswordVisible}  onChangeText={onChange}   autoCapitalize={icon? 'none' : 'words'} />
             {icon? <TouchableOpacity className='flex justify-center items-center ' onPress={togglePasswordVisibility}><Image source={require('../assets/images/eye-icon.png')} resizeMode='contain' style={styles.CustomStyleIcon}  /></TouchableOpacity>: ''}
         </View>
@@ -37,8 +37,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width:'100%',
         borderRadius: 6,
-        fontSize: 12,
-        fontFamily: 'montserrat',
+        fontSize: 12, 
+        fontFamily: 'Montserrat-Regular',
         color: "#03045E",
         backgroundColor: "#fff",
         borderWidth: 1,

@@ -8,12 +8,12 @@ import ButtonComponent from '@/components/button';
 
 export default function HomeScreen() {
 
-  useEffect(() => {
+  // useEffect(() => {
     
-    setTimeout(() => {
-      router.push('/auth/generator');
-    }, 2000);
-  }, []);
+  //   setTimeout(() => {
+  //     router.push('/auth/generator');
+  //   }, 2000);
+  // }, []);
   
   return (
     <View className="flex-1  items-center bg-white w-full">
