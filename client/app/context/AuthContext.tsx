@@ -10,13 +10,14 @@ interface AuthProps{
 }
 
 const token_key = 'token';
-export const API_URL = 'https://looplock.onrender.com';
+export const API_URL = 'https://looplock.onrender.com/auth';
 const AuthContext = createContext<AuthProps>({});
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: any) => {
-    const [authState, setAuthState] = useState({ token: null, authenticated: null });
+    const [authState, setAuthState] = useState<{ 
+        token: string | null, authenticated: boolean | null }>({ token: null, authenticated: null });
 
     useEffect(() => {
         const checkToken = async () => {
@@ -27,27 +28,58 @@ export const AuthProvider = ({ children }: any) => {
             } else {
                 setAuthState({ token: null, authenticated: false });
             }
-            setLoading(false);
         };
         checkToken();
     }, []);
 
     // Define the handler functions
-    const onRegister = async (name: string, email: string, master_password: string) => {
-        // Implement registration logic here
+    const register = async (name: string, email: string, master_password: string) => {
+        try {
+            const result =  await axios.post(`${API_URL}/register`, { name, email, master_password });
+            if (result.data && result.data.error) {
+                alert(result.data.msg);
+            } else {
+                // You need to pass email and master_password to login
+                await login(email, master_password);
+            }
+        } catch (error: any | null) {
+            return { error: true, message: (error?.response?.data.message) };
+        }
     };
 
-    const onLogin = async (email: string, password: string) => {
-        // Implement login logic here
+    const login = async (email: string, password: string) => {
+        try {
+            const response = await axios.post(`${API_URL}/login`, { email, password });
+            const token = response.data.access_token;
+            if (token) {
+                await SecureStore.setItemAsync(token_key, token);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                setAuthState({ token, authenticated: true });
+            }
+            return response;
+        } catch (error: any | null) {
+            return { error: true, message: (error?.response?.data.message) };
+        }
     };
 
-    const onLogout = async () => {
+    const logout = async () => {
         // Implement logout logic here
+        await SecureStore.deleteItemAsync(token_key);
+        axios.defaults.headers.common['Authorization'] = '';
+        setAuthState({ token: null, authenticated: false });
+    };
+
+
+    const value = {
+        authState,
+        onRegister : register,
+        onLogin: login,
+        onLogout: logout,
     };
 
     return (
-        <AuthContext.Provider value={{ authState, onRegister, onLogin, onLogout }}>
-            {loading ? null : children}
+        <AuthContext.Provider value={ value }>
+            children
         </AuthContext.Provider>
     );
 };

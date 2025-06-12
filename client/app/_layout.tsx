@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -35,15 +36,35 @@ export default function RootLayout() {
   }
 
   return (
+    <AuthProvider>
+      <RoutesLayouts />
+    </AuthProvider>
+  );
+}
+
+
+export const RoutesLayouts = () => {
+  const { authState } = useAuth();
+
+  
+  return (
     <Template>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="(screens)/public/login" />
-        <Stack.Screen name="(screens)/public/register" />
-        <Stack.Screen name="(tabs)/auth/safe" />
-        <Stack.Screen name="(tabs)/auth/generator" />
-        <Stack.Screen name="(tabs)/auth/checkup" />
-        <Stack.Screen name="(tabs)/auth/profile" />
+        { authState?.authenticated ? (
+          <>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="(screens)/public/login" />
+            <Stack.Screen name="(screens)/public/register" />
+          </>
+        ):(
+          <>
+            <Stack.Screen name="(tabs)/auth/safe" />
+            <Stack.Screen name="(tabs)/auth/generator" />
+            <Stack.Screen name="(tabs)/auth/checkup" />
+            <Stack.Screen name="(tabs)/auth/profile" />
+          </>
+        ) }
+
       </Stack>
     </Template>
   );

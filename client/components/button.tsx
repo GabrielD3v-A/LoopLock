@@ -1,4 +1,5 @@
 import register from '@/app/(screens)/public/register';
+import { useAuth } from '@/app/context/AuthContext';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
@@ -11,6 +12,7 @@ interface ButtonComponentProps {
 
 const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, params }) => {
   const [isLoading, setIsLoading] = useState(false); // Estado de carregamento
+  const { onLogin } = useAuth();
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -64,35 +66,19 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
     
     
           try {
-            fetch('http://192.168.149.227:5000/login', {
-              method: 'POST',
-              body: JSON.stringify({
-                username: username,
-                password: password
-              }),
-              headers: {
-                'Content-Type': 'application/json', // Corrigido aqui
-                'X-Custom-Header': 'value',
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive',
-                'Accept': '*'
-              }           
-            }).then((response) => {
-              console.log('Enviando dados ao backend:', params);
-              return response.json(); // Corrigido aqui
-            })
-            .then((data) => {
-              console.log('Resposta do backend:', data);
-              if(data.id == 100){
-                router.push('/safe');
-              }else{
-                console.log('Login falhou');
-              }
-            })
-            .catch((error) => {
-              console.log('Erro:', error);
-              console.log('Login falhou');
-            });
+            const result = await onLogin?.(username, password);
+            // Only check result if it's not undefined/null and has the expected structure
+            if (
+              result !== undefined &&
+              result !== null &&
+              typeof result === 'object' &&
+              'data' in result &&
+              (result as any).data?.error
+            ) {
+              alert((result as any).msg);
+            }else{
+              router.push('/(tabs)/auth/safe');
+            }
           } catch (error) {
             console.error('Erro:', error);
             Alert.alert('Erro', 'Falha na conexão. Tente novamente.');
@@ -162,7 +148,7 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
             .then((data) => {
               console.log('Resposta do backend:', data);
               if(data){
-                router.push('/safe');
+                router.push('/(tabs)/auth/safe');
               }else{
                 console.log('Cadastro falhou');
               }
