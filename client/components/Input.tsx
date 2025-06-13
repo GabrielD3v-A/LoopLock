@@ -25,7 +25,7 @@ const InputComponent: React.FC<InputComponentProps> = ({ textPlaceholder, icon, 
 
     return (
         <View className='w-full font-montserrat text-lp-blue text-base flex flex-row items-center'>
-            <TextInput numberOfLines={1} style={styles.CustomStyleInput} placeholder={textPlaceholder} placeholderTextColor="#03045E" keyboardType={'default'}  secureTextEntry={isPasswordVisible}  onChangeText={onChange}   autoCapitalize={icon? 'none' : 'words'} />
+            <TextInput numberOfLines={1} style={styles.CustomStyleInput} placeholder={textPlaceholder} placeholderTextColor="#03045E" keyboardType={'default'}  secureTextEntry={isPasswordVisible}  onChangeText={onChange}   autoCapitalize={'none'} />
             {icon? <TouchableOpacity className='flex justify-center items-center ' onPress={togglePasswordVisibility}><Image source={require('../assets/images/eye-icon.png')} resizeMode='contain' style={styles.CustomStyleIcon}  /></TouchableOpacity>: ''}
         </View>
     );

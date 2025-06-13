@@ -35,7 +35,8 @@ export default function register() {
     };
   
     const getUsernameChange = (value: string) => {
-      setUsername(value);
+      const capitalizedValue = value.replace(/\b\w/g, char => char.toUpperCase());
+      setUsername(capitalizedValue);
     }
 
     const getEmailChange = (value: string) => {
