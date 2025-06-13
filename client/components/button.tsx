@@ -62,7 +62,6 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
             Alert.alert('Erro', 'O e-mail inserido é inválido.');
             return;
           }
-          console.log(params)
           setIsLoading(true); // Inicia o estado de carregamento
     
     
@@ -70,15 +69,13 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
             const result = await onLogin?.(username, password);
             // Only check result if it's not undefined/null and has the expected structure
             if (
-              result !== undefined &&
-              result !== null &&
-              typeof result === 'object' &&
-              'data' in result &&
-              (result as any).data?.error
+              result.error
             ) {
-              alert((result as any).msg);
+              alert(result.message);
             }else{
-              router.push('/(tabs)/auth/safe');
+              if(result.status == 200){
+                router.push('/(tabs)/auth/safe');
+              }
             }
           } catch (error) {
             console.error('Erro:', error);
