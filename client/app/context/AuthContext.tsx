@@ -53,18 +53,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkToken();
   }, []);
 
-  const register = async (name: string, email: string, master_password: string) => {
+  const register = async (name: string, email: string, password: string) => {
     try {
       const result = await axios.post(`${API_URL}/register`, {
-        name,
-        email,
-        master_password,
+        "username": name,
+        "email": email,
+        "password": password,
       });
       if (result.data?.error) {
         alert(result.data.msg);
         return { error: true, message: result.data.msg };
       } else {
-        return await login(email, master_password);
+        return await login(email, password);
       }
     } catch (error: any) {
       return { error: true, message: error?.response?.data?.message || 'Erro no registro' };

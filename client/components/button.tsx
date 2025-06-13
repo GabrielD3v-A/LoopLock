@@ -13,6 +13,7 @@ interface ButtonComponentProps {
 const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, params }) => {
   const [isLoading, setIsLoading] = useState(false); // Estado de carregamento
   const { onLogin } = useAuth();
+  const { onRegister } = useAuth();
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -91,14 +92,23 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
             Alert.alert('Erro', 'Preencha todos os campos.');
             return;
           }
-          const { username, email, passwordMaster, confirmPasswordMaster, passwordStrength, terms} = params;
-          console.log(params)
+
+          const username: string = params.username;
+          const email: string = params.email;
+          const passwordMaster: string = params.passwordMaster;
+          const confirmPasswordMaster: string = params.confirmPasswordMaster;
+          const passwordStrength: number = params.passwordStrength;
+          const terms: boolean = params.terms;
+
+          console.log(username)
+          console.log(email)
+          console.log(passwordMaster)
           if (!username || !passwordMaster || !email ) {
             Alert.alert('Erro', 'Preencha os campos corretamente');
             return;
           }
 
-          if(username.lenght < 2){
+          if(username.length < 2){
             Alert.alert('Erro', 'O usuário deve ter pelo menos 2 caracteres.');
             return;
           }
@@ -113,9 +123,12 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
             return;
           }
 
-          
+          if(passwordMaster.length < 12 && confirmPasswordMaster.length < 12){
+            Alert.alert('Erro', 'A senha deve ter pelo menos 12 caracteres.');
+            return;
+          }
 
-          if (passwordStrength < 75) {
+          if (passwordStrength < 76) {
             Alert.alert('Erro', 'A senha é muito fraca. Tente novamente.');
             return;
           }
@@ -127,36 +140,24 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
           setIsLoading(true);
 
           try {
-            fetch('http://192.168.149.227:5000/register', {
-              method: 'POST',
-              body: JSON.stringify({
-                username: username,
-                email: email,
-                password: passwordMaster
-              }),
-              headers: {
-                'Content-Type': 'application/json', // Corrigido aqui
-                'X-Custom-Header': 'value',
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive',
-                'Accept': '*'
-              }           
-            }).then((response) => {
-              console.log('Enviando dados ao backend:', params);
-              return response.json(); // Corrigido aqui
-            })
-            .then((data) => {
-              console.log('Resposta do backend:', data);
-              if(data){
+            
+            const result = await onRegister?.(username, email, passwordMaster);
+            // Only check result if it's not undefined/null and has the expected structure
+            if (
+              result !== undefined &&
+              result !== null &&
+              typeof result === 'object' &&
+              'data' in result &&
+              (result as any).data?.error
+            ) {
+              alert((result as any).msg);
+            }else{
+              // router.push('/(tabs)/auth/safe');
+              if(result.status == 200){
                 router.push('/(tabs)/auth/safe');
-              }else{
-                console.log('Cadastro falhou');
               }
-            })
-            .catch((error) => {
-              console.log('Erro:', error);
-              console.log('Login falhou');
-            });
+            }
+
           } catch (error) {
             console.error('Erro:', error);
             Alert.alert('Erro', 'Falha na conexão. Tente novamente.');
