@@ -11,11 +11,14 @@ interface AuthProps {
   authState: AuthState;
   loading: boolean;
   onRegister: (name: string, email: string, master_password: string) => Promise<any>;
-  onLogin: (email: string, password: string) => Promise<any>;
+  onLogin: (email: string, password: string, rememberMe: boolean) => Promise<any>;
   onLogout: () => void;
+  onGetPassword: () => void;
 }
 
 const token_key = 'token';
+const symetric_key = 'simetric_key';
+const password_key = 'password';
 export const API_URL = 'https://looplock.onrender.com/auth';
 
 const AuthContext = createContext<AuthProps | undefined>(undefined);
@@ -64,22 +67,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         alert(result.data.msg);
         return { error: true, message: result.data.msg };
       } else {
-        return await login(email, password);
+        return await login(email, password, false);
       }
     } catch (error: any) {
       return { error: true, message: error?.response?.data?.message || 'Erro no registro' };
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, rememberMe: boolean) => {
     try {
       const response = await axios.post(`${API_URL}/login`, { email, password });
       const token = response.data.access_token;
-      if (token) {
+      const symetric = response.data.symetric_key;
+      
+      if(rememberMe){
+        await SecureStore.setItemAsync(password_key, password);
+      }
+      if (token && symetric) {
         await SecureStore.setItemAsync(token_key, token);
+        await SecureStore.setItemAsync(symetric_key, symetric);
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         setAuthState({ token, authenticated: true });
       }
+
       return response;
     } catch (error: any) {
       return { error: true, message: error?.response?.data?.message || 'Erro no login' };
@@ -92,8 +102,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setAuthState({ token: null, authenticated: false });
   };
 
+  const getpassword = async () => {
+    const password = await SecureStore.getItemAsync(password_key);
+    return password;
+  }
   return (
-    <AuthContext.Provider value={{ authState, loading, onRegister: register, onLogin: login, onLogout: logout }}>
+    <AuthContext.Provider value={{ authState, loading, onRegister: register, onLogin: login, onLogout: logout, onGetPassword: getpassword }}>
       {children}
     </AuthContext.Provider>
   );

@@ -6,9 +6,10 @@ interface InputComponentProps {
     icon: boolean;
     password: boolean;
     onChange: (value: string) => void;
+    value: string | null;
 }
 
-const InputComponent: React.FC<InputComponentProps> = ({ textPlaceholder, icon, password, onChange }) => {
+const InputComponent: React.FC<InputComponentProps> = ({ textPlaceholder, icon, password, onChange, value }) => {
     const [isPasswordVisible, setPasswordVisible] = useState(password);
 
 
@@ -25,7 +26,7 @@ const InputComponent: React.FC<InputComponentProps> = ({ textPlaceholder, icon, 
 
     return (
         <View className='w-full font-montserrat text-lp-blue text-base flex flex-row items-center'>
-            <TextInput numberOfLines={1} style={styles.CustomStyleInput} placeholder={textPlaceholder} placeholderTextColor="#03045E" keyboardType={'default'}  secureTextEntry={isPasswordVisible}  onChangeText={onChange}   autoCapitalize={'none'} />
+            <TextInput numberOfLines={1} style={styles.CustomStyleInput} placeholder={textPlaceholder} placeholderTextColor="#03045E" keyboardType={'default'}  secureTextEntry={isPasswordVisible}  onChangeText={onChange} autoCapitalize={'none'} value={value ?? ''}/>
             {icon? <TouchableOpacity className='flex justify-center items-center ' onPress={togglePasswordVisibility}><Image source={require('../assets/images/eye-icon.png')} resizeMode='contain' style={styles.CustomStyleIcon}  /></TouchableOpacity>: ''}
         </View>
     );

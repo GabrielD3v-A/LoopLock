@@ -1,22 +1,35 @@
 import { ActivityIndicator, Alert, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'expo-router';
-import { FontAwesome } from '@expo/vector-icons'; 
-import * as WebBrowser from 'expo-web-browser';
 
 import Logo from '@/components/logo';
 import InputComponent from '@/components/Input';
 import ButtonComponent from '@/components/button';
 import CheckboxComponent from '@/components/checkbox';
 import Recaptcha from '@/components/recaptcha';
+import { useAuth } from '@/app/context/AuthContext';
 
 
 
 export default function Login() {
-
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
+
+  const {onGetPassword} = useAuth();
+
+  useEffect(() => {
+  const fetchPassword = async () => {
+    const storedPassword = await onGetPassword();
+    console.log('Senha recuperada:', storedPassword);
+    if (storedPassword != null) {
+      setPassword(storedPassword);
+    }
+  };
+
+  fetchPassword();
+}, []);
+
 
   const getUsernameChange = (value: string) => {
     setUsername(value); // Atualiza apenas o username
@@ -44,8 +57,8 @@ export default function Login() {
         <Text className=' text-lp-blue text-center text-5xl my-10' style={{ fontFamily: 'Fellix-Regular' }}>Faça login</Text>
 
         <View className='w-full flex flex-col items-center gap-y-6'>
-          <InputComponent textPlaceholder='E-mail' icon={false} password={false} onChange={getUsernameChange}></InputComponent>
-          <InputComponent textPlaceholder='Senha' icon={true} password={true} onChange={getPasswordChange}></InputComponent>
+          <InputComponent textPlaceholder='E-mail' icon={false} password={false} onChange={getUsernameChange} value={null}></InputComponent>
+          <InputComponent textPlaceholder='Senha' icon={true} password={true} onChange={getPasswordChange} value={password}></InputComponent>
         </View>
 
         <View className='w-full flex items-center'>

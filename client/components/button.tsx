@@ -66,7 +66,7 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({ text, actionKey, para
     
     
           try {
-            const result = await onLogin?.(username, password);
+            const result = await onLogin?.(username, password, rememberMe);
             // Only check result if it's not undefined/null and has the expected structure
             if (
               result.error
