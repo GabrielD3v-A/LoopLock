@@ -14,6 +14,7 @@ interface AuthProps {
   onLogin: (email: string, password: string, rememberMe: boolean) => Promise<any>;
   onLogout: () => void;
   onGetPassword: () => void;
+  onResetPassword: () => void;
 }
 
 const token_key = 'token';
@@ -106,8 +107,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const password = await SecureStore.getItemAsync(password_key);
     return password;
   }
+
+  const resetPassword = async () => {
+    const response = await SecureStore.deleteItemAsync(password_key);
+  }
   return (
-    <AuthContext.Provider value={{ authState, loading, onRegister: register, onLogin: login, onLogout: logout, onGetPassword: getpassword }}>
+    <AuthContext.Provider value={{ 
+      authState, 
+      loading, 
+      onRegister: register, 
+      onLogin: login, 
+      onLogout: logout, 
+      onGetPassword: getpassword,
+      onResetPassword: resetPassword }}>
       {children}
     </AuthContext.Provider>
   );
