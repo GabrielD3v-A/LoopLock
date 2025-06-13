@@ -13,7 +13,7 @@ import { useAuth } from '@/app/context/AuthContext';
 
 export default function Login() {
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState<string | null>(null);
+  const [password, setPassword] = useState<string>('');
   const [rememberMe, setRememberMe] = useState(false);
 
   const {onGetPassword} = useAuth();
@@ -24,6 +24,7 @@ export default function Login() {
     console.log('Senha recuperada:', storedPassword);
     if (storedPassword != null) {
       setPassword(storedPassword);
+      setRememberMe(true);
     }
   };
 
@@ -57,7 +58,7 @@ export default function Login() {
         <Text className=' text-lp-blue text-center text-5xl my-10' style={{ fontFamily: 'Fellix-Regular' }}>Faça login</Text>
 
         <View className='w-full flex flex-col items-center gap-y-6'>
-          <InputComponent textPlaceholder='E-mail' icon={false} password={false} onChange={getUsernameChange} value={null}></InputComponent>
+          <InputComponent textPlaceholder='E-mail' icon={false} password={false} onChange={getUsernameChange} ></InputComponent>
           <InputComponent textPlaceholder='Senha' icon={true} password={true} onChange={getPasswordChange} value={password}></InputComponent>
         </View>
 
