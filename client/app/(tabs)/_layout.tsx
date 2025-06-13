@@ -4,8 +4,9 @@ import SearchList from '@/components/searchList';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState, useEffect } from 'react';
-import { usePathname } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useAuth } from '../context/AuthContext';
 
 export default function AuthLayout() {
   const pathname = usePathname(); 
@@ -17,6 +18,14 @@ export default function AuthLayout() {
     setResults([]);
     setShowList(false);
   }, [pathname]);
+
+  const { authState } = useAuth();
+
+  useEffect(() => {
+    if (!authState.authenticated) {
+      router.replace('/'); // expulsar de toda árvore
+    }
+  }, [authState]);
 
 
   return (

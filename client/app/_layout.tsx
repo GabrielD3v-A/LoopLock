@@ -1,17 +1,15 @@
-import { router, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import '../assets/style/global.css';
 import Template from '@/components/template';
-import * as SecureStore from 'expo-secure-store'
-import { useEffect } from 'react';
-import { ActivityIndicator } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
+import { ActivityIndicator, View, Text } from 'react-native';
 import { useFonts } from 'expo-font';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  
   const [loaded, error] = useFonts({
     'Montserrat-Bold': require("../assets/fonts/Montserrat/static/Montserrat-Bold.ttf"),
     'Montserrat-Regular': require("../assets/fonts/Montserrat/static/Montserrat-Regular.ttf"),
@@ -37,35 +35,42 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <RoutesLayouts />
+      <Template>
+        <RoutesLayouts />
+      </Template>
     </AuthProvider>
   );
 }
 
+function RoutesLayouts() {
+  const { authState, loading } = useAuth();
 
-export const RoutesLayouts = () => {
-  const { authState } = useAuth();
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+        <Text>Carregando...</Text>
+      </View>
+    );
+  }
 
-  
   return (
-    <Template>
-      <Stack screenOptions={{ headerShown: false }}>
-        { authState?.authenticated ? (
-          <>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="(screens)/public/login" />
-            <Stack.Screen name="(screens)/public/register" />
-          </>
-        ):(
-          <>
-            <Stack.Screen name="(tabs)/auth/safe" />
-            <Stack.Screen name="(tabs)/auth/generator" />
-            <Stack.Screen name="(tabs)/auth/checkup" />
-            <Stack.Screen name="(tabs)/auth/profile" />
-          </>
-        ) }
+    <Stack screenOptions={{ headerShown: false }}>
+      {authState?.authenticated ? (
+        <>
+          <Stack.Screen name="(tabs)/auth/safe" />
+          <Stack.Screen name="(tabs)/auth/generator" />
+          <Stack.Screen name="(tabs)/auth/checkup" />
+          <Stack.Screen name="(tabs)/auth/profile" />
+        </>
+      ) : (
 
-      </Stack>
-    </Template>
+        <>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="(screens)/public/login" />
+          <Stack.Screen name="(screens)/public/register" />
+        </>
+      )}
+    </Stack>
   );
 }
