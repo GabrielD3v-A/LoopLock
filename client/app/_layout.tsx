@@ -62,6 +62,7 @@ function RoutesLayouts() {
           <Stack.Screen name="(tabs)/auth/generator" />
           <Stack.Screen name="(tabs)/auth/checkup" />
           <Stack.Screen name="(tabs)/auth/profile" />
+          <Stack.Screen name="(tabs)/auth/CreateCredencial" />
         </>
       ) : (
 

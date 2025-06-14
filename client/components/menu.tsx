@@ -56,7 +56,7 @@ const Menu = () => {
           }}
         />
         <Tabs.Screen
-          name="auth/create-credencial"
+          name="auth/CreateCredential"
           options={{
             title: '',
             tabBarIcon: () => (
