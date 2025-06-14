@@ -7,6 +7,7 @@ from extensions.config import jwt
 from db.db import db
 from routes.credential import credential
 from routes.auth import auth_bp
+from routes.user import user
 from sqlalchemy import text
 
 # Flask
@@ -44,6 +45,7 @@ jwt.init_app(app)
 
 app.register_blueprint(credential)
 app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(user)
 @app.route('/')
 
 def home():

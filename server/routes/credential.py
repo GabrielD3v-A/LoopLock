@@ -255,6 +255,7 @@ def update_credential(credential_slug):
     except Exception as e:
         return jsonify({'message': f'Erro: {str(e)}'}), 500
 
+# Rota para deletar credencial do cofre do usuário
 @credential.route('/delete_credential/<credential_slug>', methods=['DELETE'])
 @jwt_required()
 def delete_credential(credential_slug):
