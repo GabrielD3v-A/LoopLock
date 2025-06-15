@@ -7,7 +7,7 @@ from models.user import User
 from flask import Blueprint, jsonify, request
 
 # Flask-JWT-Extended
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, decode_token
 
 # Criar um blueprint para agrupar as rotas principais
 auth_bp = Blueprint('auth', __name__)
@@ -101,6 +101,11 @@ def login():
 @auth_bp.route('/refresh', methods=['GET'])
 @jwt_required(refresh=True)
 def refresh_access_token():
-    identity = get_jwt_identity()
+
+    # Recupera dados enviados pelo usuário
+    data = request.get_json()
+    jwt = data.get('jwt')
+
+    identity = decode_token(jwt).get('sub')
     new_access_token = create_access_token(identity=identity)
     return jsonify(access_token=new_access_token), 200

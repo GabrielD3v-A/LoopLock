@@ -3,28 +3,32 @@ from models.user import User
 from db.db import db
 
 # Flask
-from flask import Blueprint, jsonify
+from flask import Blueprint, request, jsonify
 
 # Flask-JWT-Extended
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, decode_token
 
 user = Blueprint('user', __name__)
 
 # Rota para visualizar dados do usuário
-@user.route('/user/get-user-data', methods=['GET'])
+@user.route('/user/get-user-data', methods=['POST'])
 @jwt_required()
 def get_user_data():
+
+    # Recupera dados enviados pelo usuário
+    data = request.get_json()
+    jwt = data.get('jwt')
 
     try:
 
         # Recupera a identidade definida no token (email)
-        identity = get_jwt_identity()
+        identity = decode_token(jwt).get('sub')
 
         # Procura o usuário no banco de dados
         user = User.get_user_by_email(identity)
 
         if not user:
-            return jsonify({'message': 'Credencial não encontrada.'}), 404
+            return jsonify({'message': 'Usuário não encontrado.'}), 404
 
         # Monta a resposta
         credential_data = {
@@ -44,8 +48,12 @@ def get_user_data():
 @jwt_required()
 def delete_user():
 
+    # Recupera dados enviados pelo usuário
+    data = request.get_json()
+    jwt = data.get('jwt')
+
     # Recupera a identidade do usuário autenticado a partir do token JWT
-    identity = get_jwt_identity()
+    identity = decode_token(jwt).get('sub')
     user = User.get_user_by_email(identity)
     if not user:
         return jsonify({'message': 'Usuário não encontrado.'}), 404

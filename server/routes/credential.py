@@ -10,7 +10,7 @@ from db.db import db
 from flask import Blueprint, request, jsonify
 
 # Flask-JWT-Extended
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, decode_token
 
 credential = Blueprint('credential', __name__)
 
@@ -26,6 +26,7 @@ def create_credential():
     password = data.get('password')
     domain = data.get('domain')
     symetric_key = data.get('symetric_key')
+    jwt = data.get('jwt')
 
     try:
         # Verificando se todos os campos foram fornecidos
@@ -37,7 +38,7 @@ def create_credential():
             return jsonify({'message': 'O campo não pode exceder 128 caracteres.'}), 400
 
         # Recupera a identidade definida no token (email)
-        identity = get_jwt_identity()
+        identity = decode_token(jwt).get('sub')
 
         # Procura o usuário no banco de dados
         user_id = User.get_user_id_by_email(identity)
@@ -86,10 +87,11 @@ def select_all_credentials():
     # Recupera a chave simétrica
     data = request.get_json()
     symetric_key = data.get('symetric_key')
+    jwt = data.get('jwt')
 
     try:
         # Recupera a identidade definida no token (email)
-        identity = get_jwt_identity()
+        identity = decode_token(jwt).get('sub')
 
         # Procura o usuário no banco de dados
         user_id = User.get_user_id_by_email(identity)
@@ -132,10 +134,11 @@ def select_all_checkup():
     # Recupera a chave simétrica
     data = request.get_json()
     symetric_key = data.get('symetric_key')
+    jwt = data.get('jwt')
 
     try:
         # Recupera a identidade definida no token (email)
-        identity = get_jwt_identity()
+        identity = decode_token(jwt).get('sub')
 
         # Procura o usuário no banco de dados
         user_id = User.get_user_id_by_email(identity)
@@ -217,11 +220,12 @@ def update_credential(credential_slug):
     password = data.get('password')
     domain = data.get('domain')
     symetric_key = data.get('symetric_key')
+    jwt = data.get('jwt')
 
     try:
 
         # Recupera a identidade do usuário autenticado e verifica sua existência no banco de dados
-        identity = get_jwt_identity()
+        identity = decode_token(jwt).get('sub')
         user_id = User.get_user_id_by_email(identity)
         if not user_id:
             return jsonify({'message': 'Usuário não encontrado'}), 404
@@ -260,8 +264,12 @@ def update_credential(credential_slug):
 @jwt_required()
 def delete_credential(credential_slug):
 
+    # Recupera dados enviados pelo usuário
+    data = request.get_json()
+    jwt = data.get('jwt')
+
     # Recupera a identidade do usuário autenticado a partir do token JWT
-    identity = get_jwt_identity()
+    identity = decode_token(jwt).get('sub')
     user_id = User.get_user_id_by_email(identity)
     if not user_id:
         return jsonify({'message': 'Usuário não encontrado.'}), 404
