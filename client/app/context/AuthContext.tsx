@@ -15,12 +15,14 @@ interface AuthProps {
   onLogout: () => void;
   onGetPassword: () => void;
   onResetPassword: () => void;
+  onGetUser: () => Promise<any>;
 }
 
 const token_key = 'token';
 const symetric_key = 'simetric_key';
 const password_key = 'password';
 export const API_URL = 'https://looplock.onrender.com/auth';
+export const USER_URL = 'https://looplock.onrender.com/user';
 
 const AuthContext = createContext<AuthProps | undefined>(undefined);
 
@@ -111,6 +113,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const resetPassword = async () => {
     const response = await SecureStore.deleteItemAsync(password_key);
   }
+
+  const getUserAuth = async () => {
+    try {
+      const response = await axios.post(`${USER_URL}/get-user-data`,{
+        "jwt": authState.token
+      });
+  
+      if(response.data?.error){
+        alert(response.data.msg);
+        return { error: true, message: response.data.msg};
+      }else{
+        return response;
+      }
+    
+    } catch (err: any) {
+      return { error: true, message: err?.response?.data?.message || 'Erro na requisição' };
+    }
+  }
+
+
   return (
     <AuthContext.Provider value={{ 
       authState, 
@@ -119,7 +141,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       onLogin: login, 
       onLogout: logout, 
       onGetPassword: getpassword,
-      onResetPassword: resetPassword }}>
+      onResetPassword: resetPassword,
+      onGetUser: getUserAuth }}>
       {children}
     </AuthContext.Provider>
   );
