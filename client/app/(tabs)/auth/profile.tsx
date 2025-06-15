@@ -1,15 +1,23 @@
 import ButtonComponent from '@/components/button';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Alert, TouchableOpacity, Image, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/app/context/AuthContext'; // Importa corretamente o hook
 
 function Profile() {
-  const { onLogout, onResetPassword } = useAuth(); // <- aqui você pega o logout corretamente do contexto
+  const { onLogout, onResetPassword, onGetUser } = useAuth(); // <- aqui você pega o logout corretamente do contexto
   const { authState } = useAuth();
 
+  const [username, setUsername] = useState('');
+
   useEffect(() => {
-    console.log('authState:', authState);
+    const fetchUser = async () => {
+      console.log('authState:', authState);
+      const userData = await onGetUser(); 
+      let user = userData.data.user.user_username;
+      setUsername(user);
+    };
+    fetchUser();
   }, []);
 
   const handleLogout = async () => {
@@ -53,7 +61,7 @@ function Profile() {
       <View className='w-full flex flex-row items-center justify-between py-3 border-b border-lp-blue'>
         <View className='flex flex-row items-center h-full gap-x-2 w-3/4'>
           <Image source={require('@/assets/images/icons/user-icon-profile.png')} className='w-10 h-10' />
-          <Text className='text-sm font-normal text-lp-blue ' style={{ fontFamily: 'Fellix-Regular' }}>Gabriel Araújo de Lima</Text>
+          <Text className='text-sm font-normal text-lp-blue ' style={{ fontFamily: 'Fellix-Regular' }}>{username}</Text>
         </View>
 
         <View className='w-auto flex flex-row items-center justify-end'>
