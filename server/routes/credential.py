@@ -80,7 +80,7 @@ def create_credential():
         return jsonify({'message': f'Erro: {str(e)}'}), 500
 
 # Rota para visualizar todas as credenciais por nome
-@credential.route('/credential/select_all', methods=['GET'])
+@credential.route('/credential/list', methods=['POST'])
 @jwt_required()
 def select_all_credentials():
 
