@@ -1,7 +1,8 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { View, Text, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'
+import React, { useEffect, useState  } from 'react'
 import SafeProvider, { useSafe } from '@/app/context/SafeContext'
 import { Pressable, TextInput } from 'react-native-gesture-handler';
+import { router } from 'expo-router';
 
 export default function CreateCredentialWrapper() {
   return (
@@ -13,18 +14,83 @@ export default function CreateCredentialWrapper() {
 
 function CreateCredential() {
   const { onCreateSafe } = useSafe();
+  const { safeState } = useSafe();
 
-  const [place, setPlace] = React.useState('');
-  const [username, setUsername] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [domain, setDomain] = React.useState('');
+  const [place, setPlace] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [domain, setDomain] = useState('');
 
-  const handleCreateCredential = () => {
+  
+  
+  const [isLoading, setIsLoading] = useState(false); // Estado de carregamento
+
+  useEffect(() => {
+      const fetchUser = async () => {
+        // console.log('safeState:', safeState);
+
+      };
+      fetchUser();
+    }, []);
+
+  const handleCreateCredential = async () => {
+    if(place.length <2){
+      alert('Preencha com uma plataforma válida');
+      return;
+    }
+
+    if(username.length <2){
+      alert('Preencha com um nome de usuário valido');
+      return;
+    }
+
+    setIsLoading(true); // Inicia o estado de carregamento
+    try {
+      const result = await onCreateSafe(place, username, password, domain);
+
+      if (result.error) {
+        alert(result.message);
+      } else {
+        if (result.status == 201) {
+          Alert.alert('Sucesso', 'Credencial criada com sucesso.',[
+            {text: "Concluído", onPress: () => {
+            setDomain('');
+            setPassword('');
+            setUsername('');
+            setPlace('');
+            router.replace('/(tabs)/auth/safe')
+          }}]);
+        }
+      }
+
+    } catch (error) {
+      console.error('Erro:', error);
+      Alert.alert('Erro', 'Falha ao criar credencial. Tente novamente.');
+      setIsLoading(false);
+    }
+
+
     
   };
 
   const handleDiscardCredential = () => {
-    
+    setIsLoading(false);
+    Alert.alert("Atenção", "Deseja realmente descartar essa credencial?", 
+      [
+        {text: "Sim", onPress: () => {
+            setDomain('');
+            setPassword('');
+            setUsername('');
+            setPlace('');
+            router.replace('/(tabs)/auth/safe')  
+          }
+        },{text: "Não", style: "cancel", onPress: () => {
+
+        }}
+      ]
+    );
+
+
   };
 
   return (
@@ -101,9 +167,16 @@ function CreateCredential() {
           </Pressable>
           <View className='w-24'>
             <TouchableOpacity onPress={handleCreateCredential}>
-              <View className='flex flex-row items-center justify-center w-full bg-lp-lightblue py-2 rounded-full'>
-                <Text className='text-white text-base font-semibold' style={{ fontFamily: 'Montserrat-Medium' }}>Salvar</Text>
-              </View>
+             {isLoading ? (
+                <View className='flex flex-row items-center justify-center w-full bg-lp-lilas py-2 rounded-full'>
+                  <ActivityIndicator color="#FFF" />
+                </View>
+              ) : (
+                <View className='flex flex-row items-center justify-center w-full bg-lp-lightblue py-2 rounded-full'>
+                  <Text className='text-white text-base font-semibold' style={{ fontFamily: 'Montserrat-Medium' }}>Salvar</Text>
+                </View>
+              )}
+              
             </TouchableOpacity>
           </View>
         </View>

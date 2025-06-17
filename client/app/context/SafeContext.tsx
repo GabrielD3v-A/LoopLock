@@ -12,7 +12,7 @@ interface safeProps {
     safeState: SafeState;
     loading: boolean;
     onListSafe: () => void;
-    onCreateSafe: (name: string, username: string, password: string, domain: string) => void;
+    onCreateSafe: (name: string, username: string, password: string, domain: string) => Promise<any>;
     onEditSafe: () => void;
     onDeleteSafe: () => void;
 }
@@ -25,7 +25,7 @@ export const useSafe = () => {
     return context;
 }
 let token_key: string | null = 'token';
-let simetric_key: string | null = 'simetric_key';
+let symetric_key: string | null = 'simetric_key';
 let API_URL = 'https://looplock.onrender.com/credential';
 export const SafeProvider = ({children}: {children: ReactNode}) => {
 
@@ -42,11 +42,11 @@ export const SafeProvider = ({children}: {children: ReactNode}) => {
     useEffect(() => {
         const checkToken = async () => {
             try {
-                token_key = await SecureStore.getItemAsync('token_key');
-                simetric_key = await SecureStore.getItemAsync('simetric_key');
-                if (token_key && simetric_key) {
-                    axios.defaults.headers.common['Authorization'] = `Bearer ${token_key}`;
-                    setSafeState({ token: token_key, authenticated: true, simetric_key: simetric_key });
+                const token = await SecureStore.getItemAsync(token_key);
+                const simetric = await SecureStore.getItemAsync(symetric_key);
+                if (token && simetric) {
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                    setSafeState({ token: token, authenticated: true, simetric_key: simetric });
                 } else {
                     setSafeState({ token: null, authenticated: false, simetric_key: null });
                 }
@@ -74,12 +74,13 @@ export const SafeProvider = ({children}: {children: ReactNode}) => {
                 "username": username,
                 "password": password,
                 "domain": domain,
-                "simetric_key": safeState.simetric_key
+                "symetric_key": safeState.simetric_key,
+                "jwt": safeState.token
+
             });
 
             if (result.data?.error) {
-                alert(result.data.msg);
-                return { error: true, message: result.data.msg };
+                return { error: true, message: result.data.msg.error };
             } else {
                 return result;
             }
