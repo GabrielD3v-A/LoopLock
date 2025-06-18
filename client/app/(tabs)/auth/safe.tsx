@@ -32,6 +32,7 @@ export function Safe() {
         router.replace('/');
       } else {
         setCredentials(result.data.credentials); // garanta que seja um array
+        setAllCredentials(result.data.credentials);
       }
     } catch (error) {
       Alert.alert('Erro', 'Erro ao listar credenciais');
@@ -46,27 +47,23 @@ export function Safe() {
     }, [loading])
   );
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      const query = search.trim().toLowerCase();
-
-      if (query === '') {
-        setCredentials(allCredentials);
-      } else {
-        const filtered = allCredentials.filter((credential) =>
-          credential.credential_name.toLowerCase().includes(query)
-        );
-        setCredentials(filtered);
-      }
-    }, 300); // Espera 300ms após parar de digitar
-
-    return () => clearTimeout(timeout); // limpa se digitar de novo
-  }, [search]);
 
 
-  const handleChangeText = (value: string) => {
-    
+  const handleChangeText = (text: string) => {
+    setSearch(text);
+
+    if (text.trim() === '') {
+      setCredentials(allCredentials);
+      return;
+    }
+
+    const filtered = allCredentials.filter((cred) =>
+      cred.credential_name.toLowerCase().includes(text.toLowerCase())
+    );
+
+    setCredentials(filtered);
   };
+
 
 
   const renderItem = ({ item }: { item: Credential }) => (
@@ -101,10 +98,9 @@ export function Safe() {
           </View>
           <TextInput
             style={{ fontFamily: 'Montserrat-Regular' }}
-            placeholder="Busque por seus apps salvos..."
+            placeholder="Busque por seus apps salvos"
             className="text-lp-blue w-full h-full text-xs mx-2"
             placeholderTextColor="#03045E"
-            value={search}
             onChangeText={handleChangeText}
           />
         </View>
