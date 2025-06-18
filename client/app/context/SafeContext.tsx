@@ -11,7 +11,7 @@ interface SafeState {
 interface safeProps {
     safeState: SafeState;
     loading: boolean;
-    onListSafe: () => void;
+    onListSafe: () => Promise<any>;
     onCreateSafe: (name: string, username: string, password: string, domain: string) => Promise<any>;
     onEditSafe: () => void;
     onDeleteSafe: () => void;
@@ -40,31 +40,42 @@ export const SafeProvider = ({children}: {children: ReactNode}) => {
 
 
     useEffect(() => {
-        const checkToken = async () => {
-            try {
-                const token = await SecureStore.getItemAsync(token_key);
-                const simetric = await SecureStore.getItemAsync(symetric_key);
-                if (token && simetric) {
-                    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-                    setSafeState({ token: token, authenticated: true, simetric_key: simetric });
-                } else {
-                    setSafeState({ token: null, authenticated: false, simetric_key: null });
-                }
-            } catch (err) {
-                setSafeState({ token: null, authenticated: false, simetric_key: null });
-            } finally {
-                setLoading(false); // Finaliza o loading em qualquer caso
-            }
-        };
         checkToken();
     }, []);
 
+    const checkToken = async () => {
+        try {
+            const token = await SecureStore.getItemAsync(token_key);
+            const simetric = await SecureStore.getItemAsync(symetric_key);
+            if (token && simetric) {
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                setSafeState({ token: token, authenticated: true, simetric_key: simetric });
+            } else {
+                setSafeState({ token: null, authenticated: false, simetric_key: null });
+            }
+        } catch (err) {
+            setSafeState({ token: null, authenticated: false, simetric_key: null });
+        } finally {
+            setLoading(false); // Finaliza o loading em qualquer caso
+        }
+    };
+
     const listSafe = async () => {
         try {
-            const result = await axios.get(`${API_URL}/list`);
-            return { data: result.data };
+            const result = await axios.post(`${API_URL}/list`, {
+                "symetric_key": safeState.simetric_key,
+                "jwt": safeState.token
+            });
+
+            if (result.data?.error) {
+                return { error: true, message: result.data.msg.error };
+            }else{
+                return result;
+            }
         } catch (err: any) {
             return { error: true, message: err?.response?.data?.message || 'Erro ao listar cofre' };
+        }finally{
+            setLoading(false);
         }
     };
     const createSafe = async (name: string, username: string, password: string, domain: string) => {

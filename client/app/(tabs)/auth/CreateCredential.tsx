@@ -1,8 +1,8 @@
 import { View, Text, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'
-import React, { useEffect, useState  } from 'react'
+import React, { useCallback, useEffect, useState  } from 'react'
 import SafeProvider, { useSafe } from '@/app/context/SafeContext'
 import { Pressable, TextInput } from 'react-native-gesture-handler';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 
 export default function CreateCredentialWrapper() {
   return (
@@ -25,13 +25,11 @@ function CreateCredential() {
   
   const [isLoading, setIsLoading] = useState(false); // Estado de carregamento
 
-  useEffect(() => {
-      const fetchUser = async () => {
-        // console.log('safeState:', safeState);
-
-      };
-      fetchUser();
-    }, []);
+  useFocusEffect(
+    useCallback(() => {
+      setIsLoading(false);
+    }, [])
+  );
 
   const handleCreateCredential = async () => {
     if(place.length <2){
@@ -66,6 +64,8 @@ function CreateCredential() {
     } catch (error) {
       console.error('Erro:', error);
       Alert.alert('Erro', 'Falha ao criar credencial. Tente novamente.');
+      setIsLoading(false);
+    }finally{
       setIsLoading(false);
     }
 
@@ -111,6 +111,7 @@ function CreateCredential() {
               onChangeText={setPlace}
               numberOfLines={1}
               maxLength={30}
+              value={place}
               >  
             </TextInput>
           </View>
@@ -125,6 +126,7 @@ function CreateCredential() {
             style={{ fontFamily:'Montserrat-Regular' }}
             onChangeText={setDomain}
             numberOfLines={1}
+            value={domain}
             >
           </TextInput>
         </View>
@@ -140,6 +142,7 @@ function CreateCredential() {
             numberOfLines={1}
             autoComplete={'email'}
             maxLength={30}
+            value={username}
             >
           </TextInput>
         </View>
@@ -154,6 +157,7 @@ function CreateCredential() {
             onChangeText={setPassword}
             numberOfLines={1}
             secureTextEntry={true}
+            value={password}
             >
           </TextInput>
           <Text className='text-[0.45rem] text-lp-blue font-regular' style={{ fontFamily:'Montserrat-Regular' }}>Certifique-se que sua senha é válida na plataforma que está editando.</Text>
