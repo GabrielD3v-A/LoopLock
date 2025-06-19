@@ -3,10 +3,8 @@ import React, { useEffect } from 'react';
 import { FlatList, Text, View, Image } from 'react-native';
 
 interface ResultItem {
-  email: string;
-  icon: any;
-  id: number | string;
-  name: string;
+  credential_name: string;
+  credential_slug: string;
 }
 
 interface SearchListProps {
@@ -39,17 +37,17 @@ const SearchList: React.FC<SearchListProps> = ({ results }) => {
         <FlatList
           showsVerticalScrollIndicator={true}
           data={results}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.credential_slug}
           renderItem={({ item }) => (
             <View className="px-4 py-2 bg-lp-lilas mb-2 rounded-full text-xs flex flex-row items-center justify-between mx-4">
               <View className="flex flex-row items-center">
                 <Image
-                  source={getCredentialIcon(item.icon)}
+                  source={require('../assets/images/credentials/template.png')}
                   className="w-9 h-9 rounded-full mr-2"
                 />
                 <View className="flex flex-col items-start">
-                  <Text className="text-lp-blue text-sm font-montserrat-bold">{item.name}</Text>
-                  <Text className="text-lp-blue-2 text-xs font-montserrat-light">{item.email}</Text>
+                  <Text className="text-lp-blue text-sm font-montserrat-bold">{item.credential_name}</Text>
+                  <Text className="text-lp-blue-2 text-xs font-montserrat-light">{item.credential_name}</Text>
                 </View>
               </View>
               <Image

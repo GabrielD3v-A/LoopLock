@@ -27,6 +27,7 @@ export const useSafe = () => {
 let token_key: string | null = 'token';
 let symetric_key: string | null = 'simetric_key';
 let API_URL = 'https://looplock.onrender.com/credential';
+let credentials = 'credentials';
 export const SafeProvider = ({children}: {children: ReactNode}) => {
 
     const [safeState, setSafeState] = useState<SafeState>({
@@ -70,6 +71,7 @@ export const SafeProvider = ({children}: {children: ReactNode}) => {
             if (result.data?.error) {
                 return { error: true, message: result.data.msg.error };
             }else{
+                await SecureStore.setItemAsync(credentials, JSON.stringify(result.data.credentials));
                 return result;
             }
         } catch (err: any) {
