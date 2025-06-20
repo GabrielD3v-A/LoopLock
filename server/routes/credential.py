@@ -131,7 +131,7 @@ def select_all_credentials():
         return jsonify({'message': f'Erro: {str(e)}'}), 500
     
 # Rota para visualizar todas as credenciais e o nível de segurança delas
-@credential.route('/credential/select_all_checkup', methods=['GET'])
+@credential.route('/credential/select_all_checkup', methods=['POST'])
 @jwt_required()
 def select_all_checkup():
 
@@ -185,15 +185,24 @@ def select_all_checkup():
         return jsonify({'message': f'Erro: {str(e)}'}), 500
     
 # Rota para visualizar credenciais
-@credential.route('/credential/select/<credential_slug>', methods=['GET'])
+@credential.route('/credential/select', methods=['POST'])
 @jwt_required()
-def select_credential(credential_slug):
+def select_credential():
 
     # Recupera a chave simétrica
     data = request.get_json()
     symetric_key = data.get('symetric_key')
+    jwt = data.get('jwt')
+    credential_slug = data.get('credential_slug')
 
     try:
+        # Recupera a identidade definida no token (email)
+        identity = decode_token(jwt).get('sub')
+
+        # Procura o usuário no banco de dados
+        user_id = User.get_user_id_by_email(identity)
+        if not user_id:
+            return jsonify({'message': 'Usuário não encontrado.'}), 404
 
         # Busca a credencial e verifica a existência da mesma no banco de dados
         credential = Credential.get_credential_by_slug(credential_slug)
@@ -216,9 +225,9 @@ def select_credential(credential_slug):
         return jsonify({'message': f'Erro: {str(e)}'}), 500
 
 # Rota para atualizar de credenciais
-@credential.route('/update_credential/<credential_slug>', methods=['PUT'])
+@credential.route('/update_credential', methods=['PUT'])
 @jwt_required()
-def update_credential(credential_slug):
+def update_credential():
 
     # Recupera dados enviados pelo usuário e a chave simétrica
     data = request.get_json()
@@ -228,6 +237,7 @@ def update_credential(credential_slug):
     domain = data.get('domain')
     symetric_key = data.get('symetric_key')
     jwt = data.get('jwt')
+    credential_slug = data.get('credential_slug')
 
     try:
 
