@@ -104,16 +104,20 @@ def select_all_credentials():
         # Prepara a lista para arranjar todas as credenciais e enviar na resposta
         credential_json_list = []
         for credential in credential_list:
-
+            credential_inst = []
             credential_inst = Credential.init_select( # Utiliza um método de classe apenas para obter as informações necessárias para exibição
                 credential_name=credential[0],
-                credential_slug=credential[2]
+                credential_slug=credential[2],
+                created_at=credential[3],
+                updated_at=credential[4]
             )
 
             # Monta o retorno da requisição
             credential_data = {
                 'credential_name': credential_inst.decrypt_data(credential_inst.credential_name, symetric_key), # Decripta o nome da credencial
-                'credential_slug': credential_inst.credential_slug
+                'credential_slug': credential_inst.credential_slug,
+                'created_at': credential_inst.created_at,
+                'updated_at': credential_inst.updated_at,
             }
 
             # Adiciona o dado na lista
@@ -200,7 +204,10 @@ def select_credential(credential_slug):
         credential_data = {
             'name': credential.decrypt_data(credential.credential_name, symetric_key),
             'username': credential.decrypt_data(credential.credential_username, symetric_key),
-            'domain': credential.decrypt_data(credential.credential_domain, symetric_key)
+            'password': credential.decrypt_data(credential.credential_password, symetric_key),
+            'domain': credential.decrypt_data(credential.credential_domain, symetric_key),
+            'created_at': credential.created_at,
+            'updated_at': credential.updated_at,
         }
         return jsonify({'credential': credential_data}), 200
 

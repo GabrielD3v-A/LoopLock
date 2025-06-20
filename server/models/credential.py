@@ -29,23 +29,6 @@ class Credential(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
-    def __init__(self, credential_name, credential_username, credential_password, credential_domain, credential_slug, user_id):
-        """
-        Constructor for User model
-
-        :param user_username: Username of the user
-        :param user_email: Email of the user
-        :param user_master_password: Master password of the user
-        """
-        self.credential_name = credential_name
-        self.credential_username = credential_username
-        self.credential_password = credential_password
-        self.credential_domain = credential_domain
-        self.credential_slug = credential_slug
-        self.user_id=user_id
-
-
-
     def __repr__(self):
         return f'<Credential {self.credential_name}>'
     
@@ -126,14 +109,16 @@ class Credential(db.Model):
         self.credential_slug = slug
 
     @classmethod
-    def init_select(cls, credential_name, credential_slug):
+    def init_select(cls, credential_name, credential_slug, created_at, updated_at) -> list[str,str,str,str]:
         return cls(
             credential_name = credential_name,
             credential_username=None,
             credential_password=None,
             credential_domain=None,
             credential_slug=credential_slug,
-            user_id=None
+            user_id=None,
+            created_at=created_at,
+            updated_at=updated_at
         )
     
     @classmethod
@@ -159,7 +144,7 @@ class Credential(db.Model):
     def get_all_credentials(cls, identity):
         return (
             cls.query
-            .with_entities(Credential.credential_name, Credential.credential_password, Credential.credential_slug)
+            .with_entities(Credential.credential_name, Credential.credential_password, Credential.credential_slug, Credential.created_at, Credential.updated_at)
             .select_from(User)
             .join(Credential, User.user_id == Credential.user_id)
             .filter(User.user_email.like(f"%{identity}%"))
