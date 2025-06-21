@@ -225,7 +225,7 @@ def select_credential():
         return jsonify({'message': f'Erro: {str(e)}'}), 500
 
 # Rota para atualizar de credenciais
-@credential.route('/update_credential', methods=['PUT'])
+@credential.route('/credential/update_credential', methods=['PUT'])
 @jwt_required()
 def update_credential():
 
@@ -277,7 +277,7 @@ def update_credential():
         return jsonify({'message': f'Erro: {str(e)}'}), 500
 
 # Rota para deletar credencial do cofre do usuário
-@credential.route('/delete_credential/<credential_slug>', methods=['DELETE'])
+@credential.route('/credential/delete_credential/<credential_slug>', methods=['DELETE'])
 @jwt_required()
 def delete_credential(credential_slug):
 
